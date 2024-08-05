@@ -26,6 +26,10 @@ resource "google_cloud_run_service" "response_parser" {
       service_account_name = google_service_account.response_parser.email
       containers {
         image = "gcr.io/${var.project_id}/response-parser:latest"
+        env {
+          name  = "REASONING_BRANCH_TOPIC"
+          value = google_pubsub_topic.reasoning_branch.name
+        }
       }
     }
   }
