@@ -20,6 +20,7 @@ module "pubsub_topics" {
   project_id    = var.project_id
 
   depends_on = [
+    module.cloud_run_services,
     google_project_service.container_registry,
     google_project_service.cloud_resource_manager
   ]

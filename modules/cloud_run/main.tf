@@ -4,9 +4,9 @@ resource "google_cloud_run_service" "this" {
 
   template {
     metadata {
-      annotations = {
-        "terraform.io/force-redeploy" = timestamp()
-      }
+    #   annotations = {
+    #     "terraform.io/force-redeploy" = timestamp()
+    #   }
     }
     spec {
       service_account_name = google_service_account.this.email
@@ -16,6 +16,12 @@ resource "google_cloud_run_service" "this" {
           name  = "PUBSUB_ENDPOINT"
           value = var.pubsub_endpoint
         }
+        env {
+          name  = "PROJECT_ID"
+          value = var.project_id
+        }
+
+        
       }
     }
   }
