@@ -76,7 +76,7 @@ def response_parser():
     
 
     publisher = pubsub_v1.PublisherClient()
-    destination_topic = os.environ.get('REASONING_BRANCH_TOPIC')
+    destination_topic = os.environ.get('PUBSUB_ENDPOINT')
     project_id = get_project_id()
     topic_path = publisher.topic_path(project_id, destination_topic)
 
