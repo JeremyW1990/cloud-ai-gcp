@@ -7,4 +7,10 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 COPY response_parser.py .
 
-CMD ["python", "-m", "functions_framework", "--target=response_parser"]
+# Make sure the script is executable
+RUN chmod +x response_parser.py
+
+# Use environment variables to pass the port
+ENV PORT=8080
+
+CMD ["python", "response_parser.py"]

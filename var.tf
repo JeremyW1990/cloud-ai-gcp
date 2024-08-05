@@ -1,5 +1,10 @@
 variable "project_id" {
   description = "The ID of the Google Cloud project"
   type        = string
-  default     = "cloud-ai-431400"
+
+}
+
+variable "credentials_file" {
+  type        = string
+  description = "Path to the Google Cloud service account key file"
 }

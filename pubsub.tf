@@ -17,7 +17,7 @@ resource "google_pubsub_subscription" "response_parser_subscription" {
   push_config {
     push_endpoint = google_cloud_run_service.response_parser.status[0].url
     oidc_token {
-      service_account_email = google_cloud_run_service.response_parser.service_account
+      service_account_email = google_service_account.response_parser.email
     }
   }
 
@@ -26,10 +26,17 @@ resource "google_pubsub_subscription" "response_parser_subscription" {
 
 
 
-# # Only solution or possible solutions stored here, indivisually
-# resource "google_pubsub_topic" "reasoning_branch" {
-#   name = "reasoning-branch-topic"
-# }
+# Only solution or possible solutions stored here, indivisually
+resource "google_pubsub_topic" "reasoning_branch" {
+  name = "reasoning-branch-topic"
+}
+
+resource "google_pubsub_subscription" "reasoning-branch-subscription" {
+  name  = "reasoning-branch-subscription"
+  topic = google_pubsub_topic.reasoning_branch.name
+
+  ack_deadline_seconds = 600
+}
 
 # # response contains source codes, save it here
 # resource "google_pubsub_topic" "file_processing" {

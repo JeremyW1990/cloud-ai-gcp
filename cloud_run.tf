@@ -17,12 +17,25 @@ resource "google_cloud_run_service" "response_parser" {
   location = "us-central1"
 
   template {
+    metadata {
+      annotations = {
+        "terraform.io/force-redeploy" = timestamp()
+      }
+    }
     spec {
+      service_account_name = google_service_account.response_parser.email
       containers {
-        image = "gcr.io/your-project/response-parser:latest"
+        image = "gcr.io/${var.project_id}/response-parser:latest"
       }
     }
   }
+
+  traffic {
+    percent         = 100
+    latest_revision = true
+  }
+
+  depends_on = [google_project_service.container_registry]
 }
 
 # resource "google_cloud_run_service" "file_processor" {
