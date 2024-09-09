@@ -67,10 +67,11 @@ def response_parser():
         logging.error("No data field in the message")
         return 'No data', 400
 
-    extracted_codes = extract_paths_and_contents(message_data)
-    if extracted_codes:
-        update_codes_to_repo(extracted_codes)
+    # extracted_codes = extract_paths_and_contents(message_data)
+    # if extracted_codes:
+    #     update_codes_to_repo(extracted_codes)
     
+    message_data = message_data + "pending parser update"
 
     publisher = pubsub_v1.PublisherClient()
     destination_topic = os.environ.get('PUBSUB_ENDPOINT')
