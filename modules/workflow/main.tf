@@ -20,15 +20,17 @@ resource "google_cloud_run_service" "this" {
       containers {
         image = "gcr.io/${var.project_id}/${each.key}:latest"
         env {
-          name  = "PUBSUB_ENDPOINT"
-          value = each.value.pubsub_endpoint
-        }
-        env {
           name  = "PROJECT_ID"
           value = var.project_id
         }
-
-        
+        env {
+          name  = "PUBSUB_PULL_ENDPOINT"
+          value = each.value.pubsub_pull_endpoint
+        }
+        env {
+          name  = "PUBSUB_PUSH_ENDPOINT"
+          value = each.value.pubsub_push_endpoint
+        }
       }
     }
   }
@@ -49,15 +51,8 @@ resource "google_pubsub_subscription" "this" {
   name     = "${each.key}-subscription"
   topic    = google_pubsub_topic.this[each.key].name
 
-  dynamic "push_config" {
-    for_each = each.value.cloud_run_endpoint != "" ? [1] : []
-    content {
-      push_endpoint = google_cloud_run_service.this[each.value.cloud_run_endpoint].status[0].url
-      oidc_token {
-        service_account_email = google_service_account.this[each.value.cloud_run_endpoint].email
-      }
-    }
-  }
-
   ack_deadline_seconds = 600
+  
+  // Add message retention duration
+  message_retention_duration = "604800s" // 7 days
 }
