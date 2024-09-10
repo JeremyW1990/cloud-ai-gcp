@@ -11,7 +11,7 @@ resource "google_cloud_run_service" "this" {
   template {
     metadata {
       annotations = {
-        "terraform-redeploy-timestamp" = timestamp()
+        # "terraform-redeploy-timestamp" = timestamp()
       }
     }
 

@@ -2,5 +2,5 @@
 terraform-sa-key.json
 terraform.tfstate
 terraform.tfstate.backup
-
 .terraform.lock.hcl
+secrets.auto.tfvars
