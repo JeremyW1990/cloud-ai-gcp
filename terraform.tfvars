@@ -2,6 +2,8 @@
 project_id = "cloud-ai-431400"
 credentials_file = "C:/Users/cjwan/Documents/MY_CODE_MY_WORLD/Cloud-AI/cloud-ai-gcp/terraform-sa-key.json"
 
+project_name = "cloud-ai"
+default_user_id = "001"
 
 workflow = [
   { name = "llm-request-topic", type = "pubsub" },

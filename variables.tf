@@ -1,3 +1,8 @@
+variable "project_name" {
+  type        = string
+  description = "Name of the project"
+}
+
 variable "project_id" {
   description = "The ID of the Google Cloud project"
   type        = string
@@ -17,4 +22,17 @@ variable "workflow" {
     pubsub_push_endpoint = optional(string)
   }))
   description = "A list of workflow items (Cloud Run services or Pub/Sub topics)"
+}
+
+
+variable "openai_api_key" {
+  description = "OpenAI API Key"
+  type        = string
+  sensitive   = true
+}
+
+variable "default_user_id" {
+  type        = string
+  default     = "001"
+  description = "The default user ID to be used in the project"
 }
