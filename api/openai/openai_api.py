@@ -9,24 +9,24 @@ import os
 from openai import OpenAI
 
 def initialize_openai_client(api_key):
-    global client
     client = OpenAI(api_key=api_key)
+    return client
 
 
-def init_assistants(agents):
+def init_assistants(client, agents):
 
     created_assistants = []
 
     for agent in agents:
         name = agent["name"]
-        instructions = yaml.safe_load(agent["instructions"])
+        instruction = agent["instructions"]
         
         try:
             # Create assistant
             assistant = client.beta.assistants.create(
                 name=name,
                 tools=[],
-                instructions=yaml.dump(instructions),
+                instructions=instruction,
                 model="gpt-4o-2024-05-13",
             )
             
@@ -41,7 +41,7 @@ def show_json(obj):
     print(json.loads(obj.model_dump_json()))
 
 
-def create_thread_with_context(context):
+def create_thread_with_context(client, context):
     thread = client.beta.threads.create()
     client.beta.threads.messages.create(
         thread_id=thread.id, role="user", content=context
@@ -49,13 +49,13 @@ def create_thread_with_context(context):
     return thread
 
 
-def create_thread_and_run(assistant_id, user_input):
+def create_thread_and_run(client, assistant_id, user_input):
     thread = client.beta.threads.create()
     run = submit_message(assistant_id, thread, user_input)
     return thread, run
 
 
-def submit_message(assistant_id, thread, user_message):
+def submit_message(client, assistant_id, thread, user_message):
     client.beta.threads.messages.create(
         thread_id=thread.id, role="user", content=user_message
     )
@@ -67,7 +67,7 @@ def submit_message(assistant_id, thread, user_message):
 
 
 # Waiting in a loop
-def wait_on_run(run, thread):
+def wait_on_run(client, run, thread):
     while run.status == "queued" or run.status == "in_progress":
         run = client.beta.threads.runs.retrieve(
             thread_id=thread.id,
@@ -78,7 +78,7 @@ def wait_on_run(run, thread):
     return run
 
 
-def get_response(thread):
+def get_response(client, thread):
     return client.beta.threads.messages.list(thread_id=thread.id, order="asc")
 
 

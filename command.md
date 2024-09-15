@@ -19,3 +19,15 @@ gcloud logging read "resource.type=cloud_run_revision AND resource.labels.servic
 gcloud pubsub subscriptions pull llm-response-topic-subscription --auto-ack --limit=1
 gcloud pubsub subscriptions pull reasoning-branch-topic-subscription --auto-ack --limit=1
 
+API test:
+1. 
+docker build -t openai-api . &&
+docker run -p 8000:8000 openai-api
+curl -X POST http://localhost:8000/context \
+  -H "Content-Type: application/json" \
+  -d '{
+    "user_id": "test_user",
+    "context": "This is a test context",
+    "OPENAI_API_KEY":"sk-"
+  }'
+
