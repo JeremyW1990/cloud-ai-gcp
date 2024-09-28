@@ -9,3 +9,11 @@ module "workflow" {
     google_project_service.cloud_resource_manager
   ]
 }
+
+module "api" {
+  source = "./modules/api"
+
+  api_cloud_runs   = var.api_cloud_runs
+  project_id       = var.project_id
+  region           = var.region
+}

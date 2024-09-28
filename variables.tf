@@ -29,7 +29,6 @@ variable "workflow" {
   description = "A list of workflow items (Cloud Run services or Pub/Sub topics)"
 }
 
-
 variable "openai_api_key" {
   description = "OpenAI API Key"
   type        = string
@@ -47,3 +46,7 @@ variable "firestore_collections" {
   type    = list(string)
 }
 
+variable "api_cloud_runs" {
+  description = "List of API Cloud Run services to create"
+  type        = list(string)
+}

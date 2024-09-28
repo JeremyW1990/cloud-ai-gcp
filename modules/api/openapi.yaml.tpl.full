@@ -1,0 +1,133 @@
+openapi: 3.0.0
+info:
+  title: My API
+  version: 1.0.0
+paths:
+  /v1/user/{user_id}:
+    get:
+      x-google-backend:
+        address: ${api_services["users"]}
+      parameters:
+        - name: user_id
+          in: path
+          required: true
+          schema:
+            type: string
+    put:
+      x-google-backend:
+        address: ${api_services["users"]}
+      parameters:
+        - name: user_id
+          in: path
+          required: true
+          schema:
+            type: string
+    delete:
+      x-google-backend:
+        address: ${api_services["users"]}
+      parameters:
+        - name: user_id
+          in: path
+          required: true
+          schema:
+            type: string
+  /v1/user:
+    post:
+      x-google-backend:
+        address: ${api_services["users"]}
+  /v1/context/{context_id}:
+    get:
+      x-google-backend:
+        address: ${api_services["contexts"]}
+      parameters:
+        - name: context_id
+          in: path
+          required: true
+          schema:
+            type: string
+    put:
+      x-google-backend:
+        address: ${api_services["contexts"]}
+      parameters:
+        - name: context_id
+          in: path
+          required: true
+          schema:
+            type: string
+    delete:
+      x-google-backend:
+        address: ${api_services["contexts"]}
+      parameters:
+        - name: context_id
+          in: path
+          required: true
+          schema:
+            type: string
+  /v1/context:
+    post:
+      x-google-backend:
+        address: ${api_services["contexts"]}
+  /v1/agent/{agent_id}:
+    get:
+      x-google-backend:
+        address: ${api_services["agents"]}
+      parameters:
+        - name: agent_id
+          in: path
+          required: true
+          schema:
+            type: string
+    put:
+      x-google-backend:
+        address: ${api_services["agents"]}
+      parameters:
+        - name: agent_id
+          in: path
+          required: true
+          schema:
+            type: string
+    delete:
+      x-google-backend:
+        address: ${api_services["agents"]}
+      parameters:
+        - name: agent_id
+          in: path
+          required: true
+          schema:
+            type: string
+  /v1/agent:
+    post:
+      x-google-backend:
+        address: ${api_services["agents"]}
+  /v1/thread/{thread_id}:
+    get:
+      x-google-backend:
+        address: ${api_services["threads"]}
+      parameters:
+        - name: thread_id
+          in: path
+          required: true
+          schema:
+            type: string
+    put:
+      x-google-backend:
+        address: ${api_services["threads"]}
+      parameters:
+        - name: thread_id
+          in: path
+          required: true
+          schema:
+            type: string
+    delete:
+      x-google-backend:
+        address: ${api_services["threads"]}
+      parameters:
+        - name: thread_id
+          in: path
+          required: true
+          schema:
+            type: string
+  /v1/thread:
+    post:
+      x-google-backend:
+        address: ${api_services["threads"]}
