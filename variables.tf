@@ -42,4 +42,8 @@ variable "default_user_id" {
   description = "The default user ID to be used in the project"
 }
 
+// Define the collections as an array variable
+variable "firestore_collections" {
+  type    = list(string)
+}
 

@@ -12,3 +12,5 @@ workflow = [
   { name = "response-parser", type = "cloud_run", pubsub_pull_endpoint = "llm-response-topic", pubsub_push_endpoint = "reasoning-branch-topic" },
   { name = "reasoning-branch-topic", type = "pubsub" },
 ]
+
+firestore_collections = ["users", "agents", "threads", "contexts"]
