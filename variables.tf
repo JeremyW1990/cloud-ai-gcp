@@ -1,3 +1,8 @@
+variable "region" {
+  description = "The region where resources will be deployed"
+  type        = string
+}
+
 variable "project_name" {
   type        = string
   description = "Name of the project"
@@ -36,3 +41,5 @@ variable "default_user_id" {
   default     = "001"
   description = "The default user ID to be used in the project"
 }
+
+
