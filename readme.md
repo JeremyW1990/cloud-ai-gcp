@@ -19,14 +19,42 @@ Cloud-AI is an advanced AI tool that revolutionizes code generation through natu
 Our demo showcases the deployment of an AWS landing zone utilizing three LLM agents without any manual coding.
 
 ### Demo Resources:
-- [Video Demonstration](https://www.youtube.com/watch?v=V5R5hro-Dzw)
-- [Chat History](https://drive.google.com/file/d/1CsrIgSV1GWur_AVt_u7sj4KP56jzUNr6/view?usp=sharing)
+- [Video Demonstration](https://www.youtube.com/watch?v=V5R5hro-Dzw){:target="_blank"}
+- [Chat History](https://drive.google.com/file/d/1CsrIgSV1GWur_AVt_u7sj4KP56jzUNr6/view?usp=sharing){:target="_blank"}
 
 ### Key Highlights:
 1. **Zero-Code Deployment**: The entire infrastructure was deployed without writing a single line of code manually.
 2. **Natural Language Instructions**: We provided Cloud-AI with a detailed description of the desired AWS infrastructure using natural language.
 3. **Multi-Agent Collaboration**: Three specialized agents - Coordinator, Code, and CICD - communicated effectively to complete the task.
 4. **Dynamic Workflow**: The workflow among agents was not predefined but dynamically determined based on previous agent outputs and external tool inputs.
+
+### Demo Query:
+
+<details>
+<summary>Click to expand demo query</summary>
+
+```
+Hello, I'm seeking your expertise as a DevOps and Cloud Engineer. I plan to deploy an application on AWS using EC2 instances and require your 
+help to develop two specific AWS Terraform modules from scratch—no external pre-built modules allowed.
+
+1. VPC Module: Please create a module for a Virtual Private Cloud (VPC).
+2. EC2 Module: This module should include an autoscaling group, an application load balancer, and a security group to efficiently manage a fleet 
+of EC2 instances. Configure the EC2 instances to use the AMI ID "ami-0b0ea68c435eb488d" and include a simple userdata script that sets up a 
+homepage with the message "Auto Deployment from Cloud-AI".
+
+For each module, ensure the following files are included: main.tf, variables.tf, and outputs.tf.
+
+Additionally, create root files (included: main.tf, variables.tf, and outputs.tf at the project root level) that integrates these two modules to 
+set up the infrastructure. This configuration should invoke the VPC and EC2 modules, ensuring that they work together to deploy the application.
+Provide default values for all the variables defined in variables.tf.
+
+Ensure the application can be accessed through the ALB DNS, and that visitors to the site will see the message "Auto Deployment from Cloud-AI" 
+displayed on the webpage.
+
+Please proceed to deploy my application using these modules and provide the executable Terraform codes along with a clear folder structure 
+to organize these modules and deployment scripts.
+```
+</details>
 
 ## Infrastructure
 
@@ -42,51 +70,51 @@ The primary Cloud-AI infrastructure is hosted on Google Cloud Platform (GCP).
 
 ![Cloud-AI Infrastructure Diagram](media/image4.png)
 
-## Components
+## Cloud Runs
 
-### OrchestratorCloudRun Service
+### Orchestrator
 Manages the overall reasoning and decision-making process. It determines the next step among three possibilities:
 1. Send the message to a third-party endpoint via llm-request-queue pub/sub
 2. Gather more context before sending via vector-search-queue pub/sub
 3. Complete the current chat round via completion-queue pub/sub
 
-### DataProcessorCloudRun Service
+### Data Processor
 Responsibilities:
 1. Process files by embedding their content using an external LLM API
 2. Save original files to Cloud Storage, metadata to Firestore, and embeddings to Google Cloud's Vertex AI VectorSearch
 3. Return processed files to users for local repository updates
 
-### VectorSearchCloudRun Service
+### Vector Search
 When additional context is needed:
 1. Contact the frontend for more context
 2. Send the message with enriched context to llm-request-queue
 
-### LLMCommunicatorCloudRun Service
+### LLM Communicator
 Manages communication with external LLM APIs:
 1. Send messages to the LLM
 2. Process responses
 3. Publish processed messages to the pending-reasoning-queue Pub/Sub topic
 
-### ThreadCloudRun Service
+### Thread
 Responsible for initiating or continuing conversations.
 
 ## Pub/Sub Topics
 
 ### pending-reasoning-topic
-- **Purpose**: Stores intermediate messages processed by LLMCommunicatorCloudRun
-- **Usage**: OrchestratorCloudRun periodically checks this topic to continue the reasoning process
+- **Purpose**: Stores intermediate messages processed by LLM Communicator
+- **Usage**: Orchestrator periodically checks this topic to continue the reasoning process
 
 ### completion-topic
 - **Purpose**: Stores messages identified as complete for the current query cycle
-- **Usage**: LLMCommunicatorCloudRun processes messages from this topic to complete file-related tasks
+- **Usage**: LLM Communicator processes messages from this topic to complete file-related tasks
 
 ### vector-search-topic
 - **Purpose**: Contains requests for vector similarity searches
-- **Usage**: VectorSearchCloudRun processes messages, gathers more context from the frontend, and adds enriched messages to llm-request-topic
+- **Usage**: Vector Search processes messages, gathers more context from the frontend, and adds enriched messages to llm-request-topic
 
 ### llm-request-topic
 - **Purpose**: Stores messages ready to be sent to external LLM APIs
-- **Usage**: LLMCommunicatorCloudRun picks up these messages and sends them to the LLM service
+- **Usage**: LLM Communicator picks up these messages and sends them to the LLM service
 
 ## Storage
 
@@ -109,8 +137,8 @@ Stores embedding vector data of files in the repository.
 
 ### FileProcessor
 Frontend component responsible for handling requests from backend services:
-1. Respond to VectorSearchCloudRun requests by searching and sending more context
-2. Update source codes and their embedding vector file based on DataProcessorCloudRun requests
+1. Respond to Vector Search requests by searching and sending more context
+2. Update source codes and their embedding vector file based on Data Processor requests
 
 ## Backend
 
@@ -419,22 +447,4 @@ Cloud-AI utilizes three specialized AI agents to facilitate the development proc
 
 2. **CODE_AGENT**: A retrieve-augmented coding agent that generates and updates code based on user requirements and provided context. It follows strict formatting guidelines to maintain consistency and clarity in code updates.
 
-3. **EXTERNAL_INFO_MONITOR_AGENT**: Monitors and analyzes various external outputs related to the software development lifecycle, including test tool outputs, CICD logs, and local build results.
-
-Each agent has specific responsibilities and communication protocols to ensure smooth collaboration and efficient task completion.
-
-## Getting Started
-
-(Add instructions for setting up and using Cloud-AI here)
-
-## Contributing
-
-(Add guidelines for contributing to the Cloud-AI project here)
-
-## License
-
-(Add license information here)
-
-## Contact
-
-(Add contact information or links to support channels here)
+3. **EXTERNAL_INFO_MONITOR_AGENT
