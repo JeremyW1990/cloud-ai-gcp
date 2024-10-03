@@ -133,7 +133,7 @@ An embedded chatbox built into Microsoft Visual Studio Code, featuring:
 3. Automatic file updates from the backend
 4. User-friendly UI for code manipulation via natural language
 
-![Cloud-AI Chatbox](media/image2.png)
+![Cloud-AI Chatbox](media/vs-code-chatbox.png)
 
 ### Vector File
 Stores embedding vector data of files in the repository.
