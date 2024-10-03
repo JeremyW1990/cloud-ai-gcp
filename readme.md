@@ -64,7 +64,7 @@ The primary Cloud-AI infrastructure is hosted on Google Cloud Platform (GCP).
 - Primarily utilizes serverless services
 - Implements an event-driven design
 
-![Cloud-AI Infrastructure Diagram](media/Cloud-AI V1.png)
+![Cloud-AI Infrastructure Diagram](media/Cloud-AI-V1.png)
 
 ## Cloud Runs
 
