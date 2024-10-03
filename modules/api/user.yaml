@@ -7,7 +7,7 @@ paths:
     get:
       operationId: "getUserById"
       x-google-backend:
-        address: address: ${api_services["user"]}
+        address: https://user-232730424282.us-central1.run.app
       parameters:
         - name: user_id
           in: path
@@ -19,7 +19,7 @@ paths:
     put:
       operationId: "updateUserById"
       x-google-backend:
-        address: address: ${api_services["user"]}
+        address: https://user-232730424282.us-central1.run.app
       parameters:
         - name: user_id
           in: path
@@ -31,7 +31,7 @@ paths:
     delete:
       operationId: "deleteUserById"
       x-google-backend:
-        address: address: ${api_services["user"]}
+        address: https://user-232730424282.us-central1.run.app
       parameters:
         - name: user_id
           in: path
@@ -44,10 +44,7 @@ paths:
     post:
       operationId: "createUser"
       x-google-backend:
-        address: address: ${api_services["user"]}
+        address: https://user-232730424282.us-central1.run.app
       responses:
         200:
           description: "Successful response"
-
-        
- 

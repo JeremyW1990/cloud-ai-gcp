@@ -15,4 +15,4 @@ workflow = [
 
 firestore_collections = ["users", "agents", "threads", "contexts"]
 # api_cloud_runs = ["users", "agents", "threads", "contexts"]
-api_cloud_runs = ["users"]
+api_cloud_runs = ["user"]

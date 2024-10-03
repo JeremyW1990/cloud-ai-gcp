@@ -1,9 +1,10 @@
-# main.py
+
 from flask import Flask, request, jsonify
 from google.cloud import firestore
-
+import os
 app = Flask(__name__)
-db = firestore.Client()
+db = firestore.Client(project=os.environ.get('FIRESTORE_PROJECT_ID')) 
+
 
 @app.route('/v1/user/<user_id>', methods=['GET'])
 def get_user(user_id):
