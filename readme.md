@@ -18,16 +18,6 @@ Cloud-AI is an advanced AI tool that revolutionizes code generation through natu
 
 Our demo showcases the deployment of an AWS landing zone utilizing three LLM agents without any manual coding.
 
-### Demo Resources:
-- [Video Demonstration](https://www.youtube.com/watch?v=V5R5hro-Dzw)
-- [Chat History](https://drive.google.com/file/d/1CsrIgSV1GWur_AVt_u7sj4KP56jzUNr6/view?usp=sharing)
-
-### Key Highlights:
-1. **Zero-Code Deployment**: The entire infrastructure was deployed without writing a single line of code manually.
-2. **Natural Language Instructions**: We provided Cloud-AI with a detailed description of the desired AWS infrastructure using natural language.
-3. **Multi-Agent Collaboration**: Three specialized agents - Coordinator, Code, and CICD - communicated effectively to complete the task.
-4. **Dynamic Workflow**: The workflow among agents was not predefined but dynamically determined based on previous agent outputs and external tool inputs.
-
 ### Demo Query:
 
 <details>
@@ -56,13 +46,19 @@ to organize these modules and deployment scripts.
 ```
 </details>
 
+### Demo Resources:
+- [Video Demonstration](https://www.youtube.com/watch?v=V5R5hro-Dzw)
+- [Workflow for the demo](https://drive.google.com/file/d/1CsrIgSV1GWur_AVt_u7sj4KP56jzUNr6/view?usp=sharing)
+
+### Key Highlights:
+1. **Zero-Code Deployment**: The entire infrastructure was deployed without writing a single line of code manually.
+2. **Natural Language Instructions**: We provided Cloud-AI with a detailed description of the desired AWS infrastructure using natural language.
+3. **Multi-Agent Collaboration**: Three specialized agents - Coordinator, Code, and CICD - communicated effectively to complete the task.
+4. **Dynamic Workflow**: The workflow among agents was not predefined but dynamically determined based on previous agent outputs and external tool inputs.
+
 ## Infrastructure
 
 The primary Cloud-AI infrastructure is hosted on Google Cloud Platform (GCP).
-
-### Future Plans:
-- Implementation of a multi-cloud solution
-- Active-active configuration and disaster failover between GCP and AWS
 
 ### Architecture:
 - Primarily utilizes serverless services
@@ -120,6 +116,10 @@ Responsible for initiating or continuing conversations.
 
 - **Firestore**: Stores metadata for chat history, user information, and AI agent information
 - **Cloud Storage (Bucket)**: Stores the actual chat history
+
+### Future Plans:
+- Implementation of a multi-cloud solution
+- Active-active configuration and disaster failover between GCP and AWS
 
 ## Frontend
 
