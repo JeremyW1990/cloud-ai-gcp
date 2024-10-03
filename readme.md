@@ -120,6 +120,9 @@ Responsible for initiating or continuing conversations.
 ### Future Plans:
 - Implementation of a multi-cloud solution
 - Active-active configuration and disaster failover between GCP and AWS
+- Cloud-AI infrastructure V1 does not store user source code in the cloud, primarily to respect user privacy concerns.
+With V2, source code and vector storage will be moved to the cloud, offering greater benefits to this SaaS version.
+![Cloud-AI Infrastructure Diagram](media/Cloud-AI-V2.png)
 
 ## Frontend
 
