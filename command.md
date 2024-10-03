@@ -11,6 +11,9 @@ docker push gcr.io/cloud-ai-431400/response-parser:latest
 docker build -t gcr.io/cloud-ai-431400/llm-communicator:latest . &&
 docker push gcr.io/cloud-ai-431400/llm-communicator:latest
 
+docker build -t gcr.io/cloud-ai-431400/user:latest . &&
+docker push gcr.io/cloud-ai-431400/user:latest
+
 gcloud pubsub topics publish llm-request-topic --message "This is a mock message from Jeremy 9/9 12:46pm"
 gcloud pubsub topics publish llm-response-topic --message "This is a mock message from Jeremy 6:24 pm"
 
