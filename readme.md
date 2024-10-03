@@ -19,8 +19,8 @@ Cloud-AI is an advanced AI tool that revolutionizes code generation through natu
 Our demo showcases the deployment of an AWS landing zone utilizing three LLM agents without any manual coding.
 
 ### Demo Resources:
-- [Video Demonstration](https://www.youtube.com/watch?v=V5R5hro-Dzw){:target="_blank"}
-- [Chat History](https://drive.google.com/file/d/1CsrIgSV1GWur_AVt_u7sj4KP56jzUNr6/view?usp=sharing){:target="_blank"}
+- [Video Demonstration](https://www.youtube.com/watch?v=V5R5hro-Dzw)
+- [Chat History](https://drive.google.com/file/d/1CsrIgSV1GWur_AVt_u7sj4KP56jzUNr6/view?usp=sharing)
 
 ### Key Highlights:
 1. **Zero-Code Deployment**: The entire infrastructure was deployed without writing a single line of code manually.
