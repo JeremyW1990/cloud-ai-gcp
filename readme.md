@@ -147,7 +147,7 @@ Frontend component responsible for handling requests from backend services:
 
 The backend consists of four microservices: User, Agent, Context, and Vector. Each microservice is responsible for CRUD operations on its corresponding entities.
 
-![Backend Entity Relationships](media/image1.png)
+![Backend Entity Relationships](media/api.png)
 
 ### Backend Entities Overview
 
