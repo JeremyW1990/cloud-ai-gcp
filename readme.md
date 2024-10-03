@@ -447,4 +447,22 @@ Cloud-AI utilizes three specialized AI agents to facilitate the development proc
 
 2. **CODE_AGENT**: A retrieve-augmented coding agent that generates and updates code based on user requirements and provided context. It follows strict formatting guidelines to maintain consistency and clarity in code updates.
 
-3. **EXTERNAL_INFO_MONITOR_AGENT
+3. **EXTERNAL_INFO_MONITOR_AGENT**: Monitors and analyzes various external outputs related to the software development lifecycle, including test tool outputs, CICD logs, and local build results.
+
+Each agent has specific responsibilities and communication protocols to ensure smooth collaboration and efficient task completion.
+
+## Getting Started
+
+(Add instructions for setting up and using Cloud-AI here)
+
+## Contributing
+
+(Add guidelines for contributing to the Cloud-AI project here)
+
+## License
+
+(Add license information here)
+
+## Contact
+
+(Add contact information or links to support channels here)
