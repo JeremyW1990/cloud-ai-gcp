@@ -12,3 +12,8 @@ variable "region" {
   description = "The GCP region"
   type        = string
 }
+
+variable "firestore_id" {
+  description = "The ID of the Firestore database"
+  type        = string
+}

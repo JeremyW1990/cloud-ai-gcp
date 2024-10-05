@@ -7,7 +7,7 @@ paths:
     get:
       operationId: "getUserById"
       x-google-backend:
-        address: address: ${api_services["user"]}
+        address: "${user_service_url}"
       parameters:
         - name: user_id
           in: path
@@ -19,7 +19,7 @@ paths:
     put:
       operationId: "updateUserById"
       x-google-backend:
-        address: address: ${api_services["user"]}
+        address: "${user_service_url}"
       parameters:
         - name: user_id
           in: path
@@ -31,7 +31,7 @@ paths:
     delete:
       operationId: "deleteUserById"
       x-google-backend:
-        address: address: ${api_services["user"]}
+        address: "${user_service_url}"
       parameters:
         - name: user_id
           in: path
@@ -44,10 +44,18 @@ paths:
     post:
       operationId: "createUser"
       x-google-backend:
-        address: address: ${api_services["user"]}
+        address: "${user_service_url}/v1/user"
+      parameters:
+        - name: body
+          in: body
+          required: true
+          schema:
+            type: object
+            properties:
+              name:
+                type: string
+              email:
+                type: string
       responses:
-        200:
-          description: "Successful response"
-
-        
- 
+        201:
+          description: "User created successfully"

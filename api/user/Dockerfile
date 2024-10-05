@@ -14,5 +14,4 @@ RUN pip install --no-cache-dir -r requirements.txt
 # Make port 8080 available to the world outside this container
 EXPOSE 8080
 
-# Run app.py when the container launches
-CMD ["gunicorn", "-b", ":8080", "main:app"]
+CMD ["python", "main.py"]

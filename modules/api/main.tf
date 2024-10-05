@@ -5,12 +5,29 @@ locals {
   }
 }
 
+data "template_file" "yaml_file" {
+  template = file("${path.module}/openapi.yaml.tpl")
+
+  vars = {
+    user_service_url = local.api_services["user"]
+  }
+}
+
+data "local_file" "openapi_template" {
+  filename = "${path.module}/openapi.yaml.tpl"
+}
+
 resource "google_cloud_run_service" "api_service" {
   for_each = toset(var.api_cloud_runs)
   name     = each.key
   location = var.region
 
   template {
+      metadata {
+      annotations = {
+        "terraform-redeploy-timestamp" = timestamp()
+      }
+    }
     spec {
       service_account_name = google_service_account.api_service_account[each.key].email
 
@@ -18,8 +35,13 @@ resource "google_cloud_run_service" "api_service" {
         image = "gcr.io/${var.project_id}/${each.key}:latest"
 
         env {
-          name  = "FIRESTORE_PROJECT_ID"
+          name  = "PROJECT_ID"
           value = var.project_id
+        }
+
+        env {
+          name  = "FIRESTORE_ID"
+          value = var.firestore_id
         }
 
         env {
@@ -49,30 +71,30 @@ resource "google_api_gateway_api" "api" {
 resource "google_api_gateway_api_config" "api_config" {
   provider = google-beta  
   project = var.project_id
-  api         = google_api_gateway_api.api.api_id  
-  api_config_id = "${var.project_id}-config"  
+  api = google_api_gateway_api.api.api_id  
+  api_config_id = "${var.project_id}-config-${substr(md5(data.template_file.yaml_file.rendered), 0, 8)}"
 
   openapi_documents {
     document {
-      path     = "C:/Users/cjwan/Documents/MY_CODE_MY_WORLD/Cloud-AI/cloud-ai-gcp/modules/api/user.yaml"
-      contents = base64encode(file("C:/Users/cjwan/Documents/MY_CODE_MY_WORLD/Cloud-AI/cloud-ai-gcp/modules/api/user.yaml"))
+      path     = "${path.module}/openapi.yaml"
+      contents = base64encode(data.template_file.yaml_file.rendered)
     }
   }
-  lifecycle {
-    create_before_destroy = true
-  }
-  depends_on = [google_api_gateway_api.api] 
-}
 
-# output "rendered_openapi_document" {
-#   value = templatefile("${path.module}/openapi.yaml.tpl", {
-#     api_services = { for idx, service in var.api_cloud_runs : service => google_cloud_run_service.api_service[service].status[0].url }
-#   })
-# }
+}
 
 resource "google_api_gateway_gateway" "gateway" {
   provider = google-beta
   gateway_id = "${var.project_id}-gateway"
   api_config = google_api_gateway_api_config.api_config.id
+
+  lifecycle {
+    create_before_destroy = true
+    replace_triggered_by = [
+      google_api_gateway_api_config.api_config
+    ]
+  }
+
   depends_on = [google_api_gateway_api_config.api_config]
 }
+

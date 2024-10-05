@@ -34,3 +34,7 @@ curl -X POST http://localhost:8000/context \
     "OPENAI_API_KEY":"sk-"
   }'
 
+
+Delete API resources:
+  gcloud api-gateway gateways delete cloud-ai-431400-gateway --project=cloud-ai-431400 --location=us-central1
+  gcloud api-gateway api-configs delete cloud-ai-431400-config --api=cloud-ai-431400-api --project=cloud-ai-431400

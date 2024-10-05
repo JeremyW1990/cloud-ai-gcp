@@ -12,12 +12,16 @@ resource "google_firestore_database" "main" {
 // Create Firestore collections
 resource "google_firestore_document" "collections" {
   for_each = toset(var.firestore_collections)
-  collection = each.value
-  document_id = "_dummy_document" # Firestore requires at least one document in a collection
-  fields = jsonencode({
+  collection  = each.value
+  document_id = "_dummy_document"
+  fields      = jsonencode({
     dummy_field = {
-      string_value = "dummy_value"
+      stringValue = "dummy_value"
     }
   })
   database = google_firestore_database.main.name
+
+  lifecycle {
+    ignore_changes = [fields]
+  }
 }

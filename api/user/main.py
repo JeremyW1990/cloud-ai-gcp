@@ -1,9 +1,12 @@
-
 from flask import Flask, request, jsonify
 from google.cloud import firestore
 import os
+
 app = Flask(__name__)
-db = firestore.Client(project=os.environ.get('FIRESTORE_PROJECT_ID')) 
+db = firestore.Client(
+    project=os.environ.get('PROJECT_ID'),
+    database=os.environ.get('FIRESTORE_ID')
+) 
 
 
 @app.route('/v1/user/<user_id>', methods=['GET'])
@@ -36,4 +39,5 @@ def delete_user(user_id):
     return jsonify({"message": "User deleted"}), 200
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=8080)
+    port = int(os.environ.get('PORT', 8080))
+    app.run(host='0.0.0.0', port=port)
