@@ -6,7 +6,7 @@ locals {
 resource "google_cloud_run_service" "this" {
   for_each = local.cloud_run_services
   name     = each.key
-  location = "us-central1"
+  location = var.region
 
   template {
     metadata {

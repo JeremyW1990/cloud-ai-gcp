@@ -11,6 +11,9 @@ docker push gcr.io/cloud-ai-431400/response-parser:latest
 docker build -t gcr.io/cloud-ai-431400/llm-communicator:latest . &&
 docker push gcr.io/cloud-ai-431400/llm-communicator:latest
 
+docker build -t gcr.io/cloud-ai-431400/user:latest . &&
+docker push gcr.io/cloud-ai-431400/user:latest
+
 gcloud pubsub topics publish llm-request-topic --message "This is a mock message from Jeremy 9/9 12:46pm"
 gcloud pubsub topics publish llm-response-topic --message "This is a mock message from Jeremy 6:24 pm"
 
@@ -31,3 +34,7 @@ curl -X POST http://localhost:8000/context \
     "OPENAI_API_KEY":"sk-"
   }'
 
+
+Delete API resources:
+  gcloud api-gateway gateways delete cloud-ai-431400-gateway --project=cloud-ai-431400 --location=us-central1
+  gcloud api-gateway api-configs delete cloud-ai-431400-config --api=cloud-ai-431400-api --project=cloud-ai-431400

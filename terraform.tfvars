@@ -1,4 +1,4 @@
-
+region = "us-central1"
 project_id = "cloud-ai-431400"
 credentials_file = "C:/Users/cjwan/Documents/MY_CODE_MY_WORLD/Cloud-AI/cloud-ai-gcp/terraform-sa-key.json"
 
@@ -12,3 +12,7 @@ workflow = [
   { name = "response-parser", type = "cloud_run", pubsub_pull_endpoint = "llm-response-topic", pubsub_push_endpoint = "reasoning-branch-topic" },
   { name = "reasoning-branch-topic", type = "pubsub" },
 ]
+
+firestore_collections = ["users", "agents", "threads", "contexts"]
+# api_cloud_runs = ["users", "agents", "threads", "contexts"]
+api_cloud_runs = ["user"]

@@ -52,9 +52,3 @@ def health_check():
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', 8080))
     logging.info(f"Starting Flask app on port {port}")
-    
-    # Start pulling messages in a separate thread
-    import threading
-    threading.Thread(target=pull_messages, daemon=True).start()
-    
-    app.run(host='0.0.0.0', port=port, debug=True)
