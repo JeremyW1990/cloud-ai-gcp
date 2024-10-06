@@ -4,7 +4,8 @@ def test_create_user():
     url = 'https://cloud-ai-431400-gateway-2ywxoonu.uc.gateway.dev/v1/user'
     data = {
         "name": "Jeremy Wang",
-        "email": "shijie.wang1990@gmail.com"
+        "email": "shijie.wang1990@gmail.com",
+        "password": "123456"
     }
     response = requests.post(url, json=data)
     
