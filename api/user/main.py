@@ -1,6 +1,10 @@
 from flask import Flask, request, jsonify
 from google.cloud import firestore
 import os
+from firebase_admin import auth, initialize_app
+
+# Initialize Firebase app
+initialize_app()
 
 app = Flask(__name__)
 db = firestore.Client(
@@ -21,9 +25,30 @@ def get_user(user_id):
 @app.route('/v1/user', methods=['POST'])
 def create_user():
     data = request.get_json()
-    user_ref = db.collection('users').document()
-    user_ref.set(data)
-    return jsonify({"user_id": user_ref.id}), 201
+    email = data.get('email')
+    password = data.get('password')
+
+    if not email or not password:
+        return jsonify({"error": "Email and password are required"}), 400
+
+    try:
+        # Check if the user already exists
+        user = auth.get_user_by_email(email)
+        return jsonify({"error": "User with this email already exists"}), 409
+    except auth.UserNotFoundError:
+        # Create a new user in Firebase Auth
+        user = auth.create_user(
+            email=email,
+            password=password
+        )
+
+        # Store additional user data in Firestore
+        user_ref = db.collection('users').document(user.uid)
+        user_ref.set(data)
+
+        return jsonify({"user_id": user.uid}), 201
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
 
 @app.route('/v1/user/<user_id>', methods=['PUT'])
 def update_user(user_id):

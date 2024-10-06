@@ -11,6 +11,14 @@ resource "google_project_iam_member" "datastore_user" {
   member   = "serviceAccount:${google_service_account.api_service_account[each.key].email}"
 }
 
+# Add Firebase Authentication Admin role
+resource "google_project_iam_member" "firebase_auth_admin" {
+  for_each = toset(var.api_cloud_runs)
+  project  = var.project_id
+  role     = "roles/firebaseauth.admin"
+  member   = "serviceAccount:${google_service_account.api_service_account[each.key].email}"
+}
+
 # Allow unauthenticated access if needed
 resource "google_cloud_run_service_iam_member" "noauth" {
   for_each = toset(var.api_cloud_runs)

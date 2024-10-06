@@ -1,10 +1,12 @@
 resource "google_firestore_database" "main" {
-  name     = "${var.project_id}-metadata"
+  name        = "${var.project_id}-metadata"
   project     = var.project_id
-  location_id = var.region # You can change this to your preferred location
+  location_id = var.region
   type        = "FIRESTORE_NATIVE"
+  
   depends_on = [
-    google_project_service.firestore_api
+    google_project_service.firestore_api,
+    google_firebase_project.main  // Add this line
   ]
 }
 

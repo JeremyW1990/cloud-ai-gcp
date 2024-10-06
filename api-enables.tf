@@ -22,6 +22,15 @@ resource "google_project_service" "firestore_api" {
   disable_on_destroy = false
 }
 
+// Enable Firebase Management API
+resource "google_project_service" "firebase_api" {
+  project = var.project_id
+  service = "firebase.googleapis.com"
+
+  disable_dependent_services = true
+  disable_on_destroy         = false
+}
+
 resource "google_project_service" "apigateway" {
   project = var.project_id
   service = "apigateway.googleapis.com"
