@@ -495,9 +495,9 @@ Format Requirement:
     Example: 
     ```
     PATH: "./module/vpc"
-    \```hcl
+    \\```hcl
     VPC terraform code goes here.
-    \```
+    \\```
     ```
   - It's crucial to return the entire code file, not just the parts that have been modified!
 
