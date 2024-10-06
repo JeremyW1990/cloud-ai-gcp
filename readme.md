@@ -442,6 +442,22 @@ Deletes an existing context.
 - 204: No Content
 - 404: Context not found
 
+## Context:
+
+```
+Welcome to this AI chatroom, where a team of specialized AI agents collaborate to achieve through natural language interactions.
+
+Within this chatroom, you will interact with a few distinct AI agents, each with a specific area of expertise:
+
+Agent info listed here
+Agent name:
+Agent Description
+
+
+As you engage with the chatroom, the agents will work together to address your cloud infrastructure needs. The agent coordinator will guide the conversation, directing your queries to the appropriate specialist when necessary. The Code Agent will handle the code generation and updates, while the External Info Monitor Agent will monitor the deployment process and provide feedback.
+Please feel free to start your query, and the agents will be ready to assist you in building and managing your code repository through this collaborative effort.
+```
+
 ## Agents
 
 Cloud-AI utilizes three specialized AI agents to facilitate the development process:
