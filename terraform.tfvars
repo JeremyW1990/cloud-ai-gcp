@@ -13,6 +13,6 @@ workflow = [
   { name = "reasoning-branch-topic", type = "pubsub" },
 ]
 
-firestore_collections = ["users", "agents", "threads", "contexts"]
+firestore_collections = ["users", "agents", "threads", "contexts", "user_id_mapping"]
 # api_cloud_runs = ["users", "agents", "threads", "contexts"]
 api_cloud_runs = ["user"]
