@@ -237,7 +237,7 @@ Deletes an existing user.
 ### Agent Endpoints
 
 #### GET /v1/user/{user_id}/agent/{agent_id}
-Retrieves an existing agent's information.
+Retrieves an existing agent's information. It will check 
 
 **Response:**
 ```json
@@ -261,9 +261,10 @@ Creates a new agent.
 **Request Body:**
 ```json
 {
-  "name": "FinanceBot",
+  "agent_id": "agent_id_1",
+  "user_id": "user_id_1",
   "vendor": "OpenAI",
-  "description": "An AI agent specialized in personal finance and investment advice."
+  "vendor_agent_id": "vendor_agent_id_1",
 }
 ```
 
