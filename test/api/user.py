@@ -4,7 +4,7 @@ def test_create_user():
     url = 'https://cloud-ai-431400-gateway-2ywxoonu.uc.gateway.dev/v1/user/'
     data = {
         "name": "Jeremy Wang",
-        "email": "shijie.wang1990_2@gmail.com",
+        "email": "shijie.wang1990_1@gmail.com",
         "password": "123456"
     }
     response = requests.post(url, json=data)
@@ -19,8 +19,8 @@ def test_create_user():
     
     return response_json
 
-def test_delete_user(frontend_user_id):
-    delete_url = f'https://cloud-ai-431400-gateway-2ywxoonu.uc.gateway.dev/v1/user/{frontend_user_id}'
+def test_delete_user(user_id):
+    delete_url = f'https://cloud-ai-431400-gateway-2ywxoonu.uc.gateway.dev/v1/user/{user_id}'
     delete_response = requests.delete(delete_url)
     
     print(f"Delete Status Code: {delete_response.status_code}")
@@ -36,8 +36,8 @@ def test_delete_user(frontend_user_id):
     
     return response_json
 
-def test_get_user(frontend_user_id):
-    get_url = f'https://cloud-ai-431400-gateway-2ywxoonu.uc.gateway.dev/v1/user/{frontend_user_id}'
+def test_get_user(user_id):
+    get_url = f'https://cloud-ai-431400-gateway-2ywxoonu.uc.gateway.dev/v1/user/{user_id}'
     get_response = requests.get(get_url)
     
     print(f"Response status code: {get_response.status_code}")
@@ -52,12 +52,7 @@ def test_get_user(frontend_user_id):
         print(f"Response content type: {get_response.headers.get('Content-Type')}")
         return None  # or handle the error as appropriate for your use case
     
-    # Add assertions to check the response
-    # assert get_response.status_code == 200, f"Expected status code 200, but got {get_response.status_code}"
-    
-    # assert 'email' in user_data, "User data should contain an email field"
-    # assert 'frontend_user_id' in user_data, "User data should contain a frontend_user_id field"
-    # assert user_data['frontend_user_id'] == frontend_user_id, "Returned frontend_user_id should match the requested ID"
+
 
     # Log the response for debugging
     print(f"Response status code: {get_response.status_code}")
@@ -65,10 +60,10 @@ def test_get_user(frontend_user_id):
 
     return get_response
 
-def test_update_user(frontend_user_id):
-    update_url = f'https://cloud-ai-431400-gateway-2ywxoonu.uc.gateway.dev/v1/user/{frontend_user_id}'
+def test_update_user(user_id):
+    update_url = f'https://cloud-ai-431400-gateway-2ywxoonu.uc.gateway.dev/v1/user/{user_id}'
     update_data = {
-        "email": "shijie.wang1990@gmail.com"
+        "email": "shijie.wang1990_2@gmail.com"
     }
     update_response = requests.put(update_url, json=update_data)
     
@@ -83,9 +78,46 @@ def test_update_user(frontend_user_id):
     
     return response_json
 
-# create_result = test_create_user()
-# delete_result = test_delete_user("590e789c-d804-4140-ae8c-81f028a7d5a1")
+def run_user_api_tests():
+    print("Starting User API Tests")
+    
+    # Create user
+    print("\n1. Creating user...")
+    create_result = test_create_user()
+    if not create_result or 'user_id' not in create_result:
+        print("Failed to create user. Aborting tests.")
+        return
+    
+    user_id = create_result['user_id']
+    print(f"User created successfully. User ID: {user_id}")
+    
+    # Get user
+    print("\n2. Getting user...")
+    get_result = test_get_user(user_id)
+    if not get_result or get_result.status_code != 200:
+        print("Failed to get user. Aborting tests.")
+        return
+    print("User retrieved successfully.")
+    
+    # Update user
+    print("\n3. Updating user...")
+    update_result = test_update_user(user_id)
+    if not update_result:
+        print("Failed to update user. Aborting tests.")
+        return
+    print("User updated successfully.")
+    
+    # Delete user
+    print("\n4. Deleting user...")
+    delete_result = test_delete_user(user_id)
+    if not delete_result:
+        print("Failed to delete user.")
+    else:
+        print("User deleted successfully.")
+    
+    print("\nAll User API Tests Completed.")
 
-# get_result = test_get_user("07b3aafb-b586-4fd0-adea-23939313f278")
-
-update_result = test_update_user("07b3aafb-b586-4fd0-adea-23939313f278")
+# Run the tests
+if __name__ == "__main__":
+    # test_create_user()
+    run_user_api_tests()

@@ -54,23 +54,23 @@ def create_user():
         )
 
         # Generate a frontend user_id for frontend use
-        frontend_user_id = str(uuid.uuid4())
+        user_id = str(uuid.uuid4())
 
         # Store additional user data in Firestore
         user_ref = db.collection('users').document(firebase_user.uid)
         user_data = {
             **data,
-            'frontend_user_id': frontend_user_id,
+            'user_id': user_id,
             'firebase_uid': firebase_user.uid
         }
         user_ref.set(user_data)
 
         # Create a mapping document
-        db.collection('user_id_mapping').document(frontend_user_id).set({
+        db.collection('user_id_mapping').document(user_id).set({
             'firebase_uid': firebase_user.uid
         })
 
-        return jsonify({"user_id": frontend_user_id}), 201
+        return jsonify({"user_id": user_id}), 201
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
@@ -110,20 +110,20 @@ def get_user(user_id):
         return jsonify({"error": f"An error occurred: {str(e)}"}), 500
     
 
-@app.route('/v1/user/<frontend_user_id>', methods=['PUT'])
-def update_user(frontend_user_id):
-    logging.info(f"Updating user with frontend_user_id: {frontend_user_id}")
+@app.route('/v1/user/<user_id>', methods=['PUT'])
+def update_user(user_id):
+    logging.info(f"Updating user with user_id: {user_id}")
     
     data = request.get_json()
     logging.info(f"Received update data: {data}")
     
     # Look up the Firebase UID
-    logging.info(f"Looking up Firebase UID for frontend_user_id: {frontend_user_id}")
-    mapping_ref = db.collection('user_id_mapping').document(frontend_user_id)
+    logging.info(f"Looking up Firebase UID for user_id: {user_id}")
+    mapping_ref = db.collection('user_id_mapping').document(user_id)
     mapping = mapping_ref.get()
     
     if not mapping.exists:
-        logging.warning(f"User mapping not found for frontend_user_id: {frontend_user_id}")
+        logging.warning(f"User mapping not found for user_id: {user_id}")
         return jsonify({"error": "User not found"}), 404
     
     firebase_uid = mapping.to_dict()['firebase_uid']
@@ -143,10 +143,10 @@ def update_user(frontend_user_id):
     logging.info(f"User update completed successfully")
     return jsonify({"message": "User updated"}), 200
 
-@app.route('/v1/user/<frontend_user_id>', methods=['DELETE'])
-def delete_user(frontend_user_id):
+@app.route('/v1/user/<user_id>', methods=['DELETE'])
+def delete_user(user_id):
     # Look up the Firebase UID
-    mapping_ref = db.collection('user_id_mapping').document(frontend_user_id)
+    mapping_ref = db.collection('user_id_mapping').document(user_id)
     mapping = mapping_ref.get()
     
     if not mapping.exists:
