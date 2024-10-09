@@ -1,10 +1,13 @@
 import requests
 
-def test_create_user():
+def test_create_user(email=None):
+    if email is None:
+        email = "test@gmail.com"
+    
     url = 'https://cloud-ai-431400-gateway-2ywxoonu.uc.gateway.dev/v1/user/'
     data = {
         "name": "Jeremy Wang",
-        "email": "shijie.wang1990_1@gmail.com",
+        "email": email,
         "password": "123456"
     }
     response = requests.post(url, json=data)
@@ -83,7 +86,7 @@ def run_user_api_tests():
     
     # Create user
     print("\n1. Creating user...")
-    create_result = test_create_user()
+    create_result = test_create_user()  # Now this will use the default email if none is provided
     if not create_result or 'user_id' not in create_result:
         print("Failed to create user. Aborting tests.")
         return
@@ -119,5 +122,5 @@ def run_user_api_tests():
 
 # Run the tests
 if __name__ == "__main__":
-    # test_create_user()
+    # test_create_user("shijie.wang1990@gmail.com")
     run_user_api_tests()
