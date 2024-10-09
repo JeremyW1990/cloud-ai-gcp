@@ -237,15 +237,12 @@ Deletes an existing user.
 ### Agent Endpoints
 
 #### GET /v1/user/{user_id}/agent/{agent_id}
-Retrieves an existing agent's information. It will check 
+Retrieves an existing agent's information. It will check if the agent belongs to this user, via "agent_id" and "backend_user_id". Endpoint will find "backend_user_id" from "user_id", and then it will check if the agent belongs to this user. Only return the agent information if this agent belongs to this user.
 
 **Response:**
 ```json
 {
-  "agent_id": "agent_id_1",
-  "user_id": "user_id_1",
   "vendor": "OpenAI",
-  "vendor_agent_id": "vendor_agent_id_1",
   "name": "TravelBot",
   "description": "An AI agent specialized in travel planning, providing personalized itineraries and recommendations based on user preferences."
 }
@@ -261,17 +258,17 @@ Creates a new agent.
 **Request Body:**
 ```json
 {
-  "agent_id": "agent_id_1",
   "user_id": "user_id_1",
   "vendor": "OpenAI",
-  "vendor_agent_id": "vendor_agent_id_1",
+  "name": "TravelBot",
+  "description": "An AI agent specialized in travel planning, providing personalized itineraries and recommendations based on user preferences."
 }
 ```
 
 **Response:**
 ```json
 {
-  "vendor_agent_id": "vendor_agent_id_1"
+  "agent_id": "agent_id_1",
 }
 ```
 
