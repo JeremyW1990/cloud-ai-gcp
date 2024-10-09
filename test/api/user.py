@@ -4,7 +4,7 @@ def test_create_user():
     url = 'https://cloud-ai-431400-gateway-2ywxoonu.uc.gateway.dev/v1/user/'
     data = {
         "name": "Jeremy Wang",
-        "email": "shijie.wang1990@gmail.com",
+        "email": "shijie.wang1990_2@gmail.com",
         "password": "123456"
     }
     response = requests.post(url, json=data)
@@ -38,9 +38,6 @@ def test_delete_user(frontend_user_id):
 
 def test_get_user(frontend_user_id):
     get_url = f'https://cloud-ai-431400-gateway-2ywxoonu.uc.gateway.dev/v1/user/{frontend_user_id}'
-
-
-    
     get_response = requests.get(get_url)
     
     print(f"Response status code: {get_response.status_code}")
@@ -68,14 +65,27 @@ def test_get_user(frontend_user_id):
 
     return get_response
 
-# Call the functions to test and print the output
+def test_update_user(frontend_user_id):
+    update_url = f'https://cloud-ai-431400-gateway-2ywxoonu.uc.gateway.dev/v1/user/{frontend_user_id}'
+    update_data = {
+        "email": "shijie.wang1990@gmail.com"
+    }
+    update_response = requests.put(update_url, json=update_data)
+    
+    print(f"Update Status Code: {update_response.status_code}")
+    print(f"Update Response Content: {update_response.content}")
+    
+    try:
+        response_json = update_response.json()
+    except ValueError:
+        response_json = None
+    
+    
+    return response_json
+
 # create_result = test_create_user()
-# print(f"Create user result: {create_result}")
+# delete_result = test_delete_user("590e789c-d804-4140-ae8c-81f028a7d5a1")
 
-# Replace with an actual frontend_user_id obtained from the create_result
-# delete_result = test_delete_user("2babc323-2aa2-4c99-9685-8bf3e13b794e")
-# print(f"Delete user result: {delete_result}")
+# get_result = test_get_user("07b3aafb-b586-4fd0-adea-23939313f278")
 
-# Example usage:
-get_result = test_get_user("2babc323-2aa2-4c99-9685-8bf3e13b794e")
-# print(f"Get user result: {get_result}")
+update_result = test_update_user("07b3aafb-b586-4fd0-adea-23939313f278")
