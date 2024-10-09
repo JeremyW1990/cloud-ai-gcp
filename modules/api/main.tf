@@ -84,12 +84,13 @@ resource "google_api_gateway_api_config" "api_config" {
 }
 
 resource "google_api_gateway_gateway" "gateway" {
-  provider = google-beta
+  provider   = google-beta
+  project    = var.project_id
+  region     = var.region
   gateway_id = "${var.project_id}-gateway"
   api_config = google_api_gateway_api_config.api_config.id
 
   lifecycle {
-    create_before_destroy = true
     replace_triggered_by = [
       google_api_gateway_api_config.api_config
     ]

@@ -8,6 +8,7 @@ paths:
       operationId: "getUserById"
       x-google-backend:
         address: "${user_service_url}"
+        path_translation: APPEND_PATH_TO_ADDRESS
       parameters:
         - name: user_id
           in: path
@@ -20,6 +21,7 @@ paths:
       operationId: "updateUserById"
       x-google-backend:
         address: "${user_service_url}"
+        path_translation: APPEND_PATH_TO_ADDRESS
       parameters:
         - name: user_id
           in: path
@@ -32,6 +34,7 @@ paths:
       operationId: "deleteUserById"
       x-google-backend:
         address: "${user_service_url}"
+        path_translation: APPEND_PATH_TO_ADDRESS
       parameters:
         - name: user_id
           in: path
@@ -44,7 +47,8 @@ paths:
     post:
       operationId: "createUser"
       x-google-backend:
-        address: "${user_service_url}/v1/user"
+        address: "${user_service_url}"
+        path_translation: APPEND_PATH_TO_ADDRESS
       parameters:
         - name: body
           in: body

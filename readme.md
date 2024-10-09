@@ -53,7 +53,7 @@ to organize these modules and deployment scripts.
 ### Key Highlights:
 1. **Zero-Code Deployment**: The entire infrastructure was deployed without writing a single line of code manually.
 2. **Natural Language Instructions**: We provided Cloud-AI with a detailed description of the desired AWS infrastructure using natural language.
-3. **Multi-Agent Collaboration**: Three specialized agents - Coordinator, Code, and CICD - communicated effectively to complete the task.
+3. **Multi-Agent Collaboration**: Three specialized agents - Coordinator, Code, and External Info Monitor Agent - communicated effectively to complete the task.
 4. **Dynamic Workflow**: The workflow among agents was not predefined but dynamically determined based on previous agent outputs and external tool inputs.
 
 ## Infrastructure
@@ -450,7 +450,7 @@ Welcome to this AI chatroom, where a team of specialized AI agents collaborate t
 Within this chatroom, you will interact with a few distinct AI agents, each with a specific area of expertise. Each agent has specific responsibilities and communication protocols to ensure smooth collaboration and efficient task completion. As you engage with the chatroom, the agents will work together to address your needs. 
 The agent coordinator will guide the conversation, directing your queries to the appropriate specialist when necessary;
 The Code Agent will handle the code generation and updates;
-TheExternal Info Monitor Agent will monitor the deployment process and provide feedback.
+The External Info Monitor Agent will monitor the deployment process and provide feedback.
 
 Please feel free to start your query, and the agents will be ready to assist you in building and managing your code repository through this collaborative effort.
 
@@ -465,7 +465,7 @@ Please feel free to start your query, and the agents will be ready to assist you
 - Begin every response with the role clearly stated, e.g., 'COORDINATOR_AGENT: [Your Message]'.
 - Determine the next assistant to take over based on the latest interaction:
   - Use 'NEXT_AGENT: "CODE_AGENT"' if Code Agent should respond next.
-  - Use 'NEXT_AGENT: "EXTERNAL_INFO_MONITOR_AGENT"' for CICD Agent.
+  - Use 'NEXT_AGENT: "EXTERNAL_INFO_MONITOR_AGENT"' for External Info Monitor Agent.
   - Use 'NEXT_AGENT: "NONE"' to pause or end the interaction.
 
 **Response Status Management:**
@@ -473,8 +473,8 @@ After each interaction, evaluate and report the status of the conversation using
 
 Status Indicators:
 - `UPDATE CONTEXT`: Use if the current information is insufficient to fully answer the query, regardless of whether the information is from the current or a new context.
-- `PENDING`: Apply if the query cannot be fully resolved within the current interaction and requires additional input, or if a deployment has not been successful according to feedback from the CICD agent. This may involve verification from external systems, further deployment, testing, or human intervention.
-- `COMPLETED`: Indicates that the query has been fully addressed, typically confirmed when code changes are successfully deployed and verified through feedback from the CICD agent.
+- `PENDING`: Apply if the query cannot be fully resolved within the current interaction and requires additional input, or if a deployment has not been successful according to feedback from the External Info Monitor agent. This may involve verification from external systems, further deployment, testing, or human intervention.
+- `COMPLETED`: Indicates that the query has been fully addressed, typically confirmed when code changes are successfully deployed and verified through feedback from the External Info Monitor agent.
 
 Format Requirement:
 - List the applicable statuses in an array format at the end of your response. It's possible to apply more than one status if appropriate.
