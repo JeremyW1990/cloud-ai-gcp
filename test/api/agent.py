@@ -2,7 +2,7 @@ import requests
 import uuid
 import time
 
-BASE_URL = 'https://cloud-ai-431400-gateway-2ywxoonu.uc.gateway.dev/v1'
+ 
 
 def test_create_agent(user_id):
     url = f'{BASE_URL}/user/{user_id}/agent'
@@ -95,8 +95,8 @@ def run_agent_api_tests():
     agent_id = create_result['agent_id']
     print(f"Agent created successfully. Agent ID: {agent_id}")
     
-    print("Pausing for 45 seconds...")
-    time.sleep(45)
+
+    time.sleep(AGENT_API_WAIT_TIME)
     
     # Get agent
     print("\n2. Getting agent...")
@@ -106,8 +106,8 @@ def run_agent_api_tests():
         return
     print("Agent retrieved successfully.")
     
-    print("Pausing for 45 seconds...")
-    time.sleep(45)
+
+    time.sleep(AGENT_API_WAIT_TIME)
     
     # Update agent
     print("\n3. Updating agent...")
@@ -117,8 +117,8 @@ def run_agent_api_tests():
         return
     print("Agent updated successfully.")
     
-    print("Pausing for 45 seconds...")
-    time.sleep(45)
+
+    time.sleep(AGENT_API_WAIT_TIME)
     
     # Delete agent
     print("\n4. Deleting agent...")
@@ -133,5 +133,8 @@ def run_agent_api_tests():
     
     print("\nAll Agent API Tests Completed.")
 
+
+BASE_URL = 'https://cloud-ai-431400-gateway-2ywxoonu.uc.gateway.dev/v1'
+AGENT_API_WAIT_TIME = 20
 if __name__ == "__main__":
     run_agent_api_tests()
