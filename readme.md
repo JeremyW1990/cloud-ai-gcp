@@ -419,12 +419,9 @@ Retrieves an existing context's information.
 **Response:**
 ```json
 {
-  "context_id": "context_id_1",
-  "user_id": "user_id_1",
   "scenario": "User is planning a vacation to Europe",
   "participants": ["user_id_1", "agent_id_1", "agent_id_2"],
-  "created_at": "2024-09-25T09:00:00Z",
-  "last_updated_at": "2024-09-25T10:30:00Z"
+
 }
 ```
 
@@ -439,7 +436,22 @@ Creates a new context.
 ```json
 {
   "scenario": "User is planning a business trip to Asia",
-  "participants": ["user_id_1", "agent_id_3"]
+  "participants": ["user_id_1", "agent_id_3", ""agent_id_1"]
+}
+```
+
+**Status Codes:**
+- 201: Created
+- 400: Bad Request
+
+#### PUT /v1/user/{user_id}/context/{context_id}
+Update an existing context.
+
+**Request Body:**
+```json
+{
+  "scenario": "User is planning a business trip to Asia",
+  "participants": ["user_id_1", "agent_id_3", ""agent_id_1"]
 }
 ```
 
