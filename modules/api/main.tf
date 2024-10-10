@@ -10,6 +10,7 @@ data "template_file" "yaml_file" {
 
   vars = {
     user_service_url = local.api_services["user"]
+    agent_service_url = local.api_services["agent"]
   }
 }
 
@@ -84,12 +85,13 @@ resource "google_api_gateway_api_config" "api_config" {
 }
 
 resource "google_api_gateway_gateway" "gateway" {
-  provider = google-beta
+  provider   = google-beta
+  project    = var.project_id
+  region     = var.region
   gateway_id = "${var.project_id}-gateway"
   api_config = google_api_gateway_api_config.api_config.id
 
   lifecycle {
-    create_before_destroy = true
     replace_triggered_by = [
       google_api_gateway_api_config.api_config
     ]

@@ -4,6 +4,10 @@ import os
 from firebase_admin import initialize_app, auth
 from google.auth.exceptions import DefaultCredentialsError
 import uuid
+import logging
+
+
+logging.basicConfig(level=logging.INFO)
 
 app = Flask(__name__)
 
@@ -49,91 +53,116 @@ def create_user():
             password=password
         )
 
-        # Generate a custom user_id for frontend use
-        custom_user_id = str(uuid.uuid4())
+        # Generate a frontend user_id for frontend use
+        user_id = str(uuid.uuid4())
 
         # Store additional user data in Firestore
         user_ref = db.collection('users').document(firebase_user.uid)
         user_data = {
             **data,
-            'custom_user_id': custom_user_id,
-            'firebase_uid': firebase_user.uid
+            'user_id': user_id,
+            'backend_user_id': firebase_user.uid
         }
         user_ref.set(user_data)
 
         # Create a mapping document
-        db.collection('user_id_mapping').document(custom_user_id).set({
-            'firebase_uid': firebase_user.uid
+        db.collection('user_id_mapping').document(user_id).set({
+            'backend_user_id': firebase_user.uid
         })
 
-        return jsonify({"user_id": custom_user_id}), 201
+        return jsonify({"user_id": user_id}), 201
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
-@app.route('/v1/user/<custom_user_id>', methods=['GET'])
-def get_user(custom_user_id):
+
+@app.route('/v1/user/<user_id>', methods=['GET'])
+def get_user(user_id):
+    logging.info(f"Attempting to get user with user_id: {user_id}")
     try:
-        # Look up the Firebase UID
-        mapping_ref = db.collection('user_id_mapping').document(custom_user_id)
+        # Look up the Backend User ID
+        logging.info(f"Looking up Backend User ID for user_id: {user_id}")
+        mapping_ref = db.collection('user_id_mapping').document(user_id)
         mapping = mapping_ref.get()
         
         if not mapping.exists:
+            logging.warning(f"User mapping not found for user_id: {user_id}")
             return jsonify({"error": "User not found"}), 404
         
-        firebase_uid = mapping.to_dict()['firebase_uid']
+        backend_user_id = mapping.to_dict()['backend_user_id']
+        logging.info(f"Found Backend User ID: {backend_user_id}")
         
-        # Now fetch the user data using the Firebase UID
-        user_ref = db.collection('users').document(firebase_uid)
+        # Now fetch the user data using the Backend User ID
+        logging.info(f"Fetching user data for Backend User ID: {backend_user_id}")
+        user_ref = db.collection('users').document(backend_user_id)
         user = user_ref.get()
         if user.exists:
+            logging.info(f"User data found for Backend User ID: {backend_user_id}")
             user_data = user.to_dict()
             # Remove sensitive information before sending
-            user_data.pop('firebase_uid', None)
+            user_data.pop('backend_user_id', None)
+            logging.info("Returning user data")
             return jsonify(user_data), 200
         else:
+            logging.warning(f"User data not found for Backend User ID: {backend_user_id}")
             return jsonify({"error": "User not found"}), 404
     except Exception as e:
+        logging.error(f"An error occurred while getting user: {str(e)}")
         return jsonify({"error": f"An error occurred: {str(e)}"}), 500
-
-@app.route('/v1/user/<custom_user_id>', methods=['PUT'])
-def update_user(custom_user_id):
-    data = request.get_json()
     
-    # Look up the Firebase UID
-    mapping_ref = db.collection('user_id_mapping').document(custom_user_id)
+
+@app.route('/v1/user/<user_id>', methods=['PUT'])
+def update_user(user_id):
+    logging.info(f"Updating user with user_id: {user_id}")
+    
+    data = request.get_json()
+    logging.info(f"Received update data: {data}")
+    
+    # Look up the Backend User ID
+    logging.info(f"Looking up Backend User ID for user_id: {user_id}")
+    mapping_ref = db.collection('user_id_mapping').document(user_id)
     mapping = mapping_ref.get()
     
     if not mapping.exists:
+        logging.warning(f"User mapping not found for user_id: {user_id}")
         return jsonify({"error": "User not found"}), 404
     
-    firebase_uid = mapping.to_dict()['firebase_uid']
+    backend_user_id = mapping.to_dict()['backend_user_id']
+    logging.info(f"Found Backend User ID: {backend_user_id}")
     
     # Update the user document
-    user_ref = db.collection('users').document(firebase_uid)
-    user_ref.update(data)
+    logging.info(f"Updating user document for Backend User ID: {backend_user_id}")
+    user_ref = db.collection('users').document(backend_user_id)
     
+    try:
+        user_ref.update(data)
+        logging.info(f"User document updated successfully")
+    except Exception as e:
+        logging.error(f"Error updating user document: {str(e)}")
+        return jsonify({"error": f"Failed to update user: {str(e)}"}), 500
+    
+    logging.info(f"User update completed successfully")
     return jsonify({"message": "User updated"}), 200
 
-@app.route('/v1/user/<custom_user_id>', methods=['DELETE'])
-def delete_user(custom_user_id):
-    # Look up the Firebase UID
-    mapping_ref = db.collection('user_id_mapping').document(custom_user_id)
+@app.route('/v1/user/<user_id>', methods=['DELETE'])
+def delete_user(user_id):
+    # Look up the Backend User ID
+    mapping_ref = db.collection('user_id_mapping').document(user_id)
     mapping = mapping_ref.get()
     
     if not mapping.exists:
         return jsonify({"error": "User not found"}), 404
     
-    firebase_uid = mapping.to_dict()['firebase_uid']
+    backend_user_id = mapping.to_dict()['backend_user_id']
     
     # Delete the user document
-    user_ref = db.collection('users').document(firebase_uid)
+    user_ref = db.collection('users').document(backend_user_id)
     user_ref.delete()
     
     # Delete the mapping document
     mapping_ref.delete()
     
     # Delete the user from Firebase Auth
-    auth.delete_user(firebase_uid)
+    auth.delete_user(backend_user_id)
     
     return jsonify({"message": "User deleted"}), 200
 

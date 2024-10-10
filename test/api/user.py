@@ -1,31 +1,126 @@
 import requests
 
-def test_create_user():
-    url = 'https://cloud-ai-431400-gateway-2ywxoonu.uc.gateway.dev/v1/user'
+def test_create_user(email=None):
+    if email is None:
+        email = "test@gmail.com"
+    
+    url = 'https://cloud-ai-431400-gateway-2ywxoonu.uc.gateway.dev/v1/user/'
     data = {
         "name": "Jeremy Wang",
-        "email": "shijie.wang1990@gmail.com",
+        "email": email,
         "password": "123456"
     }
     response = requests.post(url, json=data)
     
-    # Print the status code and response content for debugging
     print(f"Status Code: {response.status_code}")
     print(f"Response Content: {response.content}")
     
-    # Check if the response is JSON
     try:
         response_json = response.json()
     except ValueError:
         response_json = None
     
-    # assert response.status_code == 201
-    # assert response_json is not None and 'user_id' in response_json
     return response_json
 
-def call_test_create_user():
-    result = test_create_user()
-    print(result)
+def test_delete_user(user_id):
+    delete_url = f'https://cloud-ai-431400-gateway-2ywxoonu.uc.gateway.dev/v1/user/{user_id}'
+    delete_response = requests.delete(delete_url)
+    
+    print(f"Delete Status Code: {delete_response.status_code}")
+    print(f"Delete Response Content: {delete_response.content}")
+    
+    try:
+        response_json = delete_response.json()
+    except ValueError:
+        response_json = None
+    
+    assert delete_response.status_code == 200, f"Failed to delete user: {delete_response.content}"
+    assert response_json is not None, "Response is not JSON"
+    
+    return response_json
 
-# Call the function to test and print the output
-call_test_create_user()
+def test_get_user(user_id):
+    get_url = f'https://cloud-ai-431400-gateway-2ywxoonu.uc.gateway.dev/v1/user/{user_id}'
+    get_response = requests.get(get_url)
+    
+    print(f"Response status code: {get_response.status_code}")
+    print(f"Response headers: {get_response.headers}")
+    print(f"Raw response content: {get_response.text}")
+    
+    try:
+        user_data = get_response.json()
+        print(f"Parsed JSON response: {user_data}")
+    except requests.exceptions.JSONDecodeError as e:
+        print(f"Failed to parse JSON. Error: {str(e)}")
+        print(f"Response content type: {get_response.headers.get('Content-Type')}")
+        return None  # or handle the error as appropriate for your use case
+    
+
+
+    # Log the response for debugging
+    print(f"Response status code: {get_response.status_code}")
+    print(f"Response body: {get_response.json()}")
+
+    return get_response
+
+def test_update_user(user_id):
+    update_url = f'https://cloud-ai-431400-gateway-2ywxoonu.uc.gateway.dev/v1/user/{user_id}'
+    update_data = {
+        "email": "shijie.wang1990_2@gmail.com"
+    }
+    update_response = requests.put(update_url, json=update_data)
+    
+    print(f"Update Status Code: {update_response.status_code}")
+    print(f"Update Response Content: {update_response.content}")
+    
+    try:
+        response_json = update_response.json()
+    except ValueError:
+        response_json = None
+    
+    
+    return response_json
+
+def run_user_api_tests():
+    print("Starting User API Tests")
+    
+    # Create user
+    print("\n1. Creating user...")
+    create_result = test_create_user()  # Now this will use the default email if none is provided
+    if not create_result or 'user_id' not in create_result:
+        print("Failed to create user. Aborting tests.")
+        return
+    
+    user_id = create_result['user_id']
+    print(f"User created successfully. User ID: {user_id}")
+    
+    # Get user
+    print("\n2. Getting user...")
+    get_result = test_get_user(user_id)
+    if not get_result or get_result.status_code != 200:
+        print("Failed to get user. Aborting tests.")
+        return
+    print("User retrieved successfully.")
+    
+    # Update user
+    print("\n3. Updating user...")
+    update_result = test_update_user(user_id)
+    if not update_result:
+        print("Failed to update user. Aborting tests.")
+        return
+    print("User updated successfully.")
+    
+    # Delete user
+    print("\n4. Deleting user...")
+    delete_result = test_delete_user(user_id)
+    if not delete_result:
+        print("Failed to delete user.")
+    else:
+        print("User deleted successfully.")
+    
+    print("\nAll User API Tests Completed.")
+
+# Run the tests
+if __name__ == "__main__":
+    # test_create_user("shijie.wang1990@gmail.com")
+    run_user_api_tests()
