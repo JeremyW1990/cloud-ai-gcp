@@ -278,6 +278,7 @@ Creates a new agent.
   "name": "TravelBot",
   "description": "An AI agent specialized in travel planning, providing personalized itineraries and recommendations based on user preferences."
 }
+```
 
 **Response:**
 ```json
@@ -412,6 +413,16 @@ Continues the chat by adding a new message to the thread.
 - 400: Bad Request
 
 ### Context Endpoints
+
+**Context Data Model in Firebase**
+```json
+{
+  "user_id": "user_id_1",
+  "backend_user_id": "backend_user_id_1",
+  "scenario": "User is planning a vacation to Europe",
+  "agents": ["agent_id_1", "agent_id_2"],
+}
+```
 
 #### GET /v1/user/{user_id}/context/{context_id}
 Retrieves an existing context's information.
