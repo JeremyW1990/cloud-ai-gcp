@@ -48,14 +48,18 @@ def create_agent(user_id):
         
         backend_user_id = mapping.to_dict()['backend_user_id']
         
-        # Generate a new agent_id
-        agent_id = str(uuid.uuid4())
+        # Generate a new agent_id using Firestore's auto-generated ID
+        agent_ref = db.collection('agents').document()
+        agent_id = agent_ref.id
+        
+        # Use hardcoded vendor_agent_id
+        vendor_agent_id = "mock_vendor_agent_id"
         
         # Prepare agent data
         agent_data = {
             "user_id": user_id,
             "backend_user_id": backend_user_id,
-            "vendor_agent_id": "mock_openai_agent_id",  # Hardcoded for now
+            "vendor_agent_id": vendor_agent_id,
             "agent_id": agent_id,
             "vendor": data.get('vendor'),
             "name": data.get('name'),
@@ -63,7 +67,12 @@ def create_agent(user_id):
         }
         
         # Store the agent data
-        db.collection('agents').document(agent_id).set(agent_data)
+        agent_ref.set(agent_data)
+        
+        # Create agent_id to vendor_agent_id mapping
+        db.collection('agent_id_mapping').document(agent_id).set({
+            'vendor_agent_id': vendor_agent_id
+        })
         
         return jsonify({"agent_id": agent_id}), 201
     except Exception as e:
@@ -103,7 +112,8 @@ def get_agent(user_id, agent_id):
         return jsonify({
             "vendor": agent_data['vendor'],
             "name": agent_data['name'],
-            "description": agent_data['description']
+            "description": agent_data['description'],
+            "vendor_agent_id": agent_data['vendor_agent_id']
         }), 200
     except Exception as e:
         logging.error(f"An error occurred while getting agent: {str(e)}")
@@ -146,7 +156,19 @@ def update_agent(user_id, agent_id):
             "name": data.get('name', agent_data['name']),
             "description": data.get('description', agent_data['description'])
         }
+        
+        # If vendor has changed, update vendor_agent_id
+        if 'vendor' in data and data['vendor'] != agent_data['vendor']:
+            # Use hardcoded vendor_agent_id
+            update_data['vendor_agent_id'] = "mock_vendor_agent_id"
+        
         agent_ref.update(update_data)
+        
+        # Update agent_id to vendor_agent_id mapping if vendor_agent_id has changed
+        if 'vendor_agent_id' in update_data:
+            db.collection('agent_id_mapping').document(agent_id).update({
+                'vendor_agent_id': update_data['vendor_agent_id']
+            })
         
         return jsonify({"message": "Agent updated successfully"}), 200
     except Exception as e:
@@ -182,7 +204,14 @@ def delete_agent(user_id, agent_id):
             logging.warning(f"Agent {agent_id} does not belong to user {user_id}")
             return jsonify({"error": "Agent not found"}), 404
         
-        # Delete the agent
+        # Delete the agent from the vendor (you may want to add actual vendor API call here)
+        vendor_agent_id = "mock_vendor_agent_id"
+        logging.info(f"Deleting vendor agent with vendor_agent_id: {vendor_agent_id}")
+        
+        # Delete the agent_id to vendor_agent_id mapping
+        db.collection('agent_id_mapping').document(agent_id).delete()
+        
+        # Delete the agent from Firestore
         agent_ref.delete()
         
         return '', 204
