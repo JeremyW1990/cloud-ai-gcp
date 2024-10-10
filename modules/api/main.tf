@@ -10,6 +10,7 @@ data "template_file" "yaml_file" {
 
   vars = {
     user_service_url = local.api_services["user"]
+    agent_service_url = local.api_services["agent"]
   }
 }
 

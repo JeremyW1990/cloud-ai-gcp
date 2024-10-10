@@ -14,6 +14,9 @@ docker push gcr.io/cloud-ai-431400/llm-communicator:latest
 docker build -t gcr.io/cloud-ai-431400/user:latest -f api/user/Dockerfile api/user &&
 docker push gcr.io/cloud-ai-431400/user:latest && terraform apply 
 
+docker build -t gcr.io/cloud-ai-431400/agent:latest -f api/agent/Dockerfile api/agent &&
+docker push gcr.io/cloud-ai-431400/agent:latest && terraform apply 
+
 docker build -t gcr.io/cloud-ai-431400/user:latest . &&
 docker push gcr.io/cloud-ai-431400/user:latest
 
