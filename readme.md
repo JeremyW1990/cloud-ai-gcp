@@ -265,6 +265,20 @@ Creates a new agent.
 }
 ```
 
+"vendor_agent_id" is an ID returned from the third-party API. It will not return to the user but kept internally in agent data.
+
+**Agent Data Model in Firebase**
+```json
+{
+  "user_id": "user_id_1",
+  "backend_user_id": "backend_user_id_1",
+  "vendor_agent_id": "vendor_agent_id_1",
+  "agent_id": "agent_id_1",
+  "vendor": "OpenAI",
+  "name": "TravelBot",
+  "description": "An AI agent specialized in travel planning, providing personalized itineraries and recommendations based on user preferences."
+}
+
 **Response:**
 ```json
 {
