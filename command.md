@@ -17,8 +17,9 @@ docker push gcr.io/cloud-ai-431400/user:latest && terraform apply
 docker build -t gcr.io/cloud-ai-431400/agent:latest -f api/agent/Dockerfile api/agent &&
 docker push gcr.io/cloud-ai-431400/agent:latest && terraform apply 
 
-docker build -t gcr.io/cloud-ai-431400/user:latest . &&
-docker push gcr.io/cloud-ai-431400/user:latest
+docker build -t gcr.io/cloud-ai-431400/context:latest -f api/context/Dockerfile api/context &&
+docker push gcr.io/cloud-ai-431400/context:latest && terraform apply 
+
 
 gcloud pubsub topics publish llm-request-topic --message "This is a mock message from Jeremy 9/9 12:46pm"
 gcloud pubsub topics publish llm-response-topic --message "This is a mock message from Jeremy 6:24 pm"
