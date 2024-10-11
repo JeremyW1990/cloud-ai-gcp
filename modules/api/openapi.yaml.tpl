@@ -180,6 +180,126 @@ paths:
           type: string
       responses:
         204:
-          description: "No Content"
+          description: "Agent deleted successfully"
         404:
           description: "Agent not found"
+
+  /v1/user/{user_id}/context:
+    post:
+      operationId: "createContext"
+      x-google-backend:
+        address: "${context_service_url}"
+        path_translation: APPEND_PATH_TO_ADDRESS
+      parameters:
+        - name: user_id
+          in: path
+          required: true
+          type: string
+        - name: body
+          in: body
+          required: true
+          schema:
+            type: object
+            properties:
+              scenario:
+                type: string
+              agents:
+                type: array
+                items:
+                  type: string
+      responses:
+        201:
+          description: "Context created successfully"
+          schema:
+            type: object
+            properties:
+              context_id:
+                type: string
+        400:
+          description: "Bad Request"
+        404:
+          description: "User not found"
+
+  /v1/user/{user_id}/context/{context_id}:
+    get:
+      operationId: "getContextById"
+      x-google-backend:
+        address: "${context_service_url}"
+        path_translation: APPEND_PATH_TO_ADDRESS
+      parameters:
+        - name: user_id
+          in: path
+          required: true
+          type: string
+        - name: context_id
+          in: path
+          required: true
+          type: string
+      responses:
+        200:
+          description: "Successful response"
+          schema:
+            type: object
+            properties:
+              context_id:
+                type: string
+              scenario:
+                type: string
+              agents:
+                type: array
+                items:
+                  type: string
+        404:
+          description: "Context not found"
+    put:
+      operationId: "updateContextById"
+      x-google-backend:
+        address: "${context_service_url}"
+        path_translation: APPEND_PATH_TO_ADDRESS
+      parameters:
+        - name: user_id
+          in: path
+          required: true
+          type: string
+        - name: context_id
+          in: path
+          required: true
+          type: string
+        - name: body
+          in: body
+          required: true
+          schema:
+            type: object
+            properties:
+              scenario:
+                type: string
+              agents:
+                type: array
+                items:
+                  type: string
+      responses:
+        200:
+          description: "Context updated successfully"
+        400:
+          description: "Bad Request"
+        404:
+          description: "Context not found"
+    delete:
+      operationId: "deleteContextById"
+      x-google-backend:
+        address: "${context_service_url}"
+        path_translation: APPEND_PATH_TO_ADDRESS
+      parameters:
+        - name: user_id
+          in: path
+          required: true
+          type: string
+        - name: context_id
+          in: path
+          required: true
+          type: string
+      responses:
+        204:
+          description: "No Content"
+        404:
+          description: "Context not found"
