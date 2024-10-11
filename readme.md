@@ -417,6 +417,8 @@ Continues the chat by adding a new message to the thread.
 **Context Data Model in Firebase**
 ```json
 {
+  "context_id": "context_id_1",
+  "backend_context_id": "backend_context_id_1",
   "user_id": "user_id_1",
   "backend_user_id": "backend_user_id_1",
   "scenario": "User is planning a vacation to Europe",
