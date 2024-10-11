@@ -6,6 +6,8 @@ from google.auth.exceptions import DefaultCredentialsError
 import uuid
 import logging
 
+from api.vendor.vendor_strategy import get_strategy
+
 logging.basicConfig(level=logging.INFO)
 
 app = Flask(__name__)
@@ -37,6 +39,10 @@ def create_agent(user_id):
     logging.info(f"Creating agent for user_id: {user_id}")
     try:
         data = request.get_json()
+        vendor = data.get('vendor')
+        
+        # Get the appropriate strategy based on the vendor
+        strategy = get_strategy(vendor)
         
         # Look up the Backend User ID
         mapping_ref = db.collection('user_id_mapping').document(user_id)
@@ -52,8 +58,11 @@ def create_agent(user_id):
         agent_ref = db.collection('agents').document()
         agent_id = agent_ref.id
         
-        # Use hardcoded vendor_agent_id
-        vendor_agent_id = "mock_vendor_agent_id"
+        # Initialize the client and create the assistant using the strategy
+        api_key = data.get('api_key')  # Assume API key is provided in the request
+        client = strategy.initialize_client(api_key)
+        vendor_agent = strategy.init_assistant(data.get('name'), data.get('description'))
+        vendor_agent_id = vendor_agent.id
         
         # Prepare agent data
         agent_data = {
@@ -61,7 +70,7 @@ def create_agent(user_id):
             "backend_user_id": backend_user_id,
             "vendor_agent_id": vendor_agent_id,
             "agent_id": agent_id,
-            "vendor": data.get('vendor'),
+            "vendor": vendor,
             "name": data.get('name'),
             "description": data.get('description')
         }
@@ -74,7 +83,7 @@ def create_agent(user_id):
             'vendor_agent_id': vendor_agent_id
         })
         
-        return jsonify({"agent_id": agent_id}), 201
+        return jsonify({"agent_id": agent_id, "vendor_agent_id": vendor_agent_id}), 201
     except Exception as e:
         logging.error(f"An error occurred while creating agent: {str(e)}")
         return jsonify({"error": f"An error occurred: {str(e)}"}), 500

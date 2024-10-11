@@ -1,0 +1,4 @@
+flask
+pydantic
+pyyaml
+openai>=1.0.0
