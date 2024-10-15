@@ -449,7 +449,7 @@ Creates a new context.
 ```json
 {
   "scenario": "User is planning a business trip to Asia",
-  "participants": ["user_id_1", "agent_id_3", ""agent_id_1"]
+  "participants": ["user_id_1", "agent_id_3", "agent_id_1"]
 }
 ```
 
@@ -464,7 +464,7 @@ Update an existing context.
 ```json
 {
   "scenario": "User is planning a business trip to Asia",
-  "participants": ["user_id_1", "agent_id_3", ""agent_id_1"]
+  "participants": ["user_id_1", "agent_id_3", "agent_id_1"]
 }
 ```
 
@@ -481,6 +481,8 @@ Deletes an existing context.
 
 
 ## Context
+
+
 
 Welcome to this AI chatroom, where a team of specialized AI agents collaborate to achieve results through natural language interactions.
 
