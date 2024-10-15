@@ -79,8 +79,7 @@ def create_agent(user_id):
         # Log the vendor_agent dictionary
         logging.info(f"Vendor agent details: {vendor_agent}")
         
-        # Access the vendor_agent_id correctly
-        vendor_agent_id = vendor_agent.get('id') if isinstance(vendor_agent, dict) else vendor_agent.id
+        vendor_agent_id = vendor_agent.get('id') 
         logging.info(f"Vendor agent ID: {vendor_agent_id}")
         
         # Prepare agent data
@@ -91,7 +90,8 @@ def create_agent(user_id):
             "agent_id": agent_id,
             "vendor": vendor,
             "name": data.get('name'),
-            "description": data.get('description')
+            "description": data.get('description'),
+            "status": "active"
         }
         
         # Store the agent data
@@ -102,7 +102,11 @@ def create_agent(user_id):
             'vendor_agent_id': vendor_agent_id
         })
         
-        return jsonify({"agent_id": agent_id, "vendor_agent_id": vendor_agent_id}), 201
+        return jsonify({
+            "agent_id": agent_id,
+            "vendor_agent_id": vendor_agent_id,
+            "status": agent_data["status"]
+        }), 201
     except Exception as e:
         logging.error(f"An error occurred while creating agent: {str(e)}")
         return jsonify({"error": f"An error occurred: {str(e)}"}), 500
@@ -141,7 +145,8 @@ def get_agent(user_id, agent_id):
             "vendor": agent_data['vendor'],
             "name": agent_data['name'],
             "description": agent_data['description'],
-            "vendor_agent_id": agent_data['vendor_agent_id']
+            "vendor_agent_id": agent_data['vendor_agent_id'],
+            "status": agent_data['status']
         }), 200
     except Exception as e:
         logging.error(f"An error occurred while getting agent: {str(e)}")
@@ -198,7 +203,10 @@ def update_agent(user_id, agent_id):
                 'vendor_agent_id': update_data['vendor_agent_id']
             })
         
-        return jsonify({"message": "Agent updated successfully"}), 200
+        return jsonify({
+            "message": "Agent updated successfully",
+            "status": agent_data['status']
+        }), 200
     except Exception as e:
         logging.error(f"An error occurred while updating agent: {str(e)}")
         return jsonify({"error": f"An error occurred: {str(e)}"}), 500

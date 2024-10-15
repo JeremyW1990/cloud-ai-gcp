@@ -110,34 +110,34 @@ def run_agent_api_tests():
         time.sleep(AGENT_API_WAIT_TIME)
         
         # Get agent
-        # print("\n2. Getting agent...")
-        # get_result = test_get_agent(user_id, agent_id)
-        # if not get_result:
-        #     print("Failed to get agent. Aborting tests.")
-        #     return
-        # print("Agent retrieved successfully.")
+        print("\n2. Getting agent...")
+        get_result = test_get_agent(user_id, agent_id)
+        if not get_result:
+            print("Failed to get agent. Aborting tests.")
+            return
+        print("Agent retrieved successfully.")
         
 
-        # time.sleep(AGENT_API_WAIT_TIME)
+        time.sleep(AGENT_API_WAIT_TIME)
         
-        # # Update agent
-        # print("\n3. Updating agent...")
-        # update_result = test_update_agent(user_id, agent_id)
-        # if not update_result:
-        #     print("Failed to update agent. Aborting tests.")
-        #     return
-        # print("Agent updated successfully.")
+        # Update agent
+        print("\n3. Updating agent...")
+        update_result = test_update_agent(user_id, agent_id)
+        if not update_result:
+            print("Failed to update agent. Aborting tests.")
+            return
+        print("Agent updated successfully.")
         
 
-        # time.sleep(AGENT_API_WAIT_TIME)
+        time.sleep(AGENT_API_WAIT_TIME)
         
-        # # Delete agent
-        # print("\n4. Deleting agent...")
-        # delete_result = test_delete_agent(user_id, agent_id)
-        # if not delete_result:
-        #     print("Failed to delete agent.")
-        # else:
-        #     print("Agent deleted successfully.")
+        # Delete agent
+        print("\n4. Deleting agent...")
+        delete_result = test_delete_agent(user_id, agent_id)
+        if not delete_result:
+            print("Failed to delete agent.")
+        else:
+            print("Agent deleted successfully.")
     finally:
         # Clean up: Delete the test user
         requests.delete(f"{BASE_URL}/user/{user_id}")

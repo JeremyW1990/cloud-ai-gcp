@@ -124,12 +124,4 @@ def pretty_print(messages):
         print(f"{m.content[0].text.value}")
         print()
 
-def printout_chat_history(response):
-    f = io.StringIO()
-    with contextlib.redirect_stdout(f):
-        pretty_print(response)
-    out = f.getvalue()
-
-    with open("chat_history.md", "w") as file:
-        file.write(out)
 
