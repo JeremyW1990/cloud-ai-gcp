@@ -1,10 +1,9 @@
-from api.vendor.vendor_strategy import AIStrategy
+from api.vendor.base_strategy import AIStrategy
 from openai import OpenAI
 import time
 import contextlib
 import io
 import json
-import yaml
 import re
 import os
 
@@ -54,7 +53,7 @@ class OpenAIStrategy(AIStrategy):
                 instructions=instruction,
                 model="gpt-4o-2024-05-13",
             )
-            return {"name": name, f"{name.upper().replace(' ', '_')}_ID": assistant.id}
+            return {"name": name, f"{name.upper().replace(' ', '_')}_ID": assistant.id, "id": assistant.id}
         except Exception as e:
             print(f"Error creating assistant {name}: {str(e)}")
             return None

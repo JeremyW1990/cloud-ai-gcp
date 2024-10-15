@@ -1,4 +1,4 @@
-from api.vendor.vendor_strategy import AIStrategy
+from api.vendor.base_strategy import AIStrategy
 
 
 class ClaudeStrategy(AIStrategy):

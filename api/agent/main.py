@@ -1,10 +1,18 @@
+import sys
+import os
 from flask import Flask, request, jsonify
 from google.cloud import firestore
-import os
 from firebase_admin import initialize_app, auth
 from google.auth.exceptions import DefaultCredentialsError
 import uuid
+import google.cloud.logging
+
+# Setup Cloud Logging
+client = google.cloud.logging.Client()
+client.setup_logging()
+
 import logging
+
 
 from api.vendor.vendor_strategy import get_strategy
 
@@ -26,13 +34,18 @@ try:
         database=os.environ.get('FIRESTORE_ID')
     )
 except DefaultCredentialsError:
-    print("Error: Unable to initialize Firestore client. Check your credentials.")
+    logging.error("Error: Unable to initialize Firestore client. Check your credentials.")
     db = None
 
 @app.before_request
 def before_request():
     if db is None:
         return jsonify({"error": "Database connection not available"}), 500
+
+# Log startup information
+logging.info("Application starting")
+logging.info(f"Python path: {sys.path}")
+logging.info(f"Current working directory: {os.getcwd()}")
 
 @app.route('/v1/user/<user_id>/agent', methods=['POST'])
 def create_agent(user_id):
@@ -62,7 +75,13 @@ def create_agent(user_id):
         api_key = data.get('api_key')  # Assume API key is provided in the request
         client = strategy.initialize_client(api_key)
         vendor_agent = strategy.init_assistant(data.get('name'), data.get('description'))
-        vendor_agent_id = vendor_agent.id
+        
+        # Log the vendor_agent dictionary
+        logging.info(f"Vendor agent details: {vendor_agent}")
+        
+        # Access the vendor_agent_id correctly
+        vendor_agent_id = vendor_agent.get('id') if isinstance(vendor_agent, dict) else vendor_agent.id
+        logging.info(f"Vendor agent ID: {vendor_agent_id}")
         
         # Prepare agent data
         agent_data = {
@@ -230,4 +249,5 @@ def delete_agent(user_id, agent_id):
 
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', 8080))
+    logging.info(f"Starting Flask app on port {port}")
     app.run(host='0.0.0.0', port=port)
