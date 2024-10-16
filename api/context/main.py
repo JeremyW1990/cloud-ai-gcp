@@ -67,10 +67,12 @@ def create_context(user_id):
 
         agent_ids = []
         for agent in data.get('agents'):
+            logging.info(f"Processing agent: {agent}")
             agent_id, error = create_agent_util(client, agent, strategy)
             if error:
                 logging.error(f"Error creating agent: {error}")
                 return jsonify({"error": f"Error creating agent: {error}"}), 400
+            logging.info(f"Successfully created agent with ID: {agent_id}")
             agent_ids.append(agent_id)
         
 
@@ -80,7 +82,7 @@ def create_context(user_id):
             "context_id": context_id,
             "user_id": user_id,
             "backend_user_id": backend_user_id,
-            "scenario": data.get('scenario'),
+            "instructions": data.get('context').get('instructions'),
             "agents": agent_ids
         }
         
@@ -140,7 +142,7 @@ def get_context(user_id, context_id):
         # Return only the required fields
         return jsonify({
             "context_id": context_data['context_id'],
-            "scenario": context_data['scenario'],
+            "instructions": context_data['instructions'],
             "agents": context_data['agents']
         }), 200
     except Exception as e:
@@ -191,7 +193,7 @@ def update_context(user_id, context_id):
         
         # Update the context data
         update_data = {
-            "scenario": data.get('scenario', context_data['scenario']),
+            "instructions": data.get('instructions', context_data['instructions']),
             "agents": data.get('agents', context_data['agents'])
         }
         

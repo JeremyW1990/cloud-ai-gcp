@@ -1,15 +1,20 @@
 import os
 from google.cloud import firestore
 from google.oauth2 import service_account
+import firebase_admin
+from firebase_admin import credentials, auth
 
 # Path to your service account key JSON file
 service_account_path = '../../terraform-sa-key.json'
 
 # Create credentials using the service account key
-credentials = service_account.Credentials.from_service_account_file(service_account_path)
+firebase_credentials = credentials.Certificate(service_account_path)
 
 # Initialize the Firestore client with the specific database and location
-db = firestore.Client(project='cloud-ai-431400', credentials=credentials, database='cloud-ai-431400-metadata')
+db = firestore.Client(project='cloud-ai-431400', credentials=service_account.Credentials.from_service_account_file(service_account_path), database='cloud-ai-431400-metadata')
+
+# Initialize the Firebase Admin SDK
+firebase_admin.initialize_app(firebase_credentials)
 
 def delete_collection(collection_name, batch_size=10):
     """
@@ -32,7 +37,7 @@ def delete_collection(collection_name, batch_size=10):
         return delete_collection(collection_name, batch_size)
 
     # Add a placeholder document to keep the collection
-    collection_ref.document('placeholder').set({'status': 'empty'})
+    collection_ref.document('_dummy_document').set({'dummy_field': 'dummy_value'})
 
 def delete_all_collections():
     """
@@ -43,5 +48,19 @@ def delete_all_collections():
         print(f'Deleting documents in collection: {collection.id}')
         delete_collection(collection.id)
 
+def delete_all_firebase_users():
+    """
+    Delete all users in the Firebase Authentication system.
+    """
+    page = auth.list_users()
+    while page:
+        for user in page.users:
+            print(f'Deleting user: {user.uid}')
+            auth.delete_user(user.uid)
+        page = page.get_next_page()
+
 # Call the function to delete all documents in all collections
 delete_all_collections()
+
+# Call the function to delete all users
+delete_all_firebase_users()

@@ -155,7 +155,7 @@ The backend consists of four microservices: User, Agent, Context, and Vector. Ea
 
 2. **Agent**: Virtual AI bots created by users. Agents specialize in particular domains and participate in conversations with users, either individually or in groups.
 
-3. **Context**: Provides the scenario or theme for conversations (threads). It tracks key information and participants (users and agents) involved in discussions.
+3. **Context**: Provides the instructions or theme for conversations (threads). It tracks key information and participants (users and agents) involved in discussions.
 
 4. **Thread**: Represents specific conversations between users and agents within a particular context. Threads contain all exchanged messages.
 
@@ -164,7 +164,7 @@ The backend consists of four microservices: User, Agent, Context, and Vector. Ea
 ### Entity Relationships
 
 - **User-Agent**: Users create and manage agents. Agents are bound to their creators and specialize in specific domains.
-- **User-Context**: Users can create multiple contexts, each representing a unique scenario. Contexts serve as containers for multiple threads.
+- **User-Context**: Users can create multiple contexts, each representing a unique instructions. Contexts serve as containers for multiple threads.
 - **User-Thread**: Users initiate threads within contexts. Threads capture interactions between users and agents.
 - **Thread-Message**: Threads comprise multiple messages exchanged between users and agents, maintaining chronological order and metadata.
 - **Context-Thread**: Contexts hold one or more threads, allowing ongoing conversations linked to the same overarching topic.
@@ -421,7 +421,7 @@ Continues the chat by adding a new message to the thread.
   "backend_context_id": "backend_context_id_1",
   "user_id": "user_id_1",
   "backend_user_id": "backend_user_id_1",
-  "scenario": "User is planning a vacation to Europe",
+  "instructions": "User is planning a vacation to Europe",
   "agents": ["agent_id_1", "agent_id_2"],
 }
 ```
@@ -432,7 +432,7 @@ Retrieves an existing context's information.
 **Response:**
 ```json
 {
-  "scenario": "User is planning a vacation to Europe",
+  "instructions": "User is planning a vacation to Europe",
   "participants": ["user_id_1", "agent_id_1", "agent_id_2"],
 
 }
@@ -448,7 +448,7 @@ Creates a new context.
 **Request Body:**
 ```json
 {
-  "scenario": "User is planning a business trip to Asia",
+  "instructions": "User is planning a business trip to Asia",
   "participants": ["user_id_1", "agent_id_3", ""agent_id_1"]
 }
 ```
@@ -463,7 +463,7 @@ Update an existing context.
 **Request Body:**
 ```json
 {
-  "scenario": "User is planning a business trip to Asia",
+  "instructions": "User is planning a business trip to Asia",
   "participants": ["user_id_1", "agent_id_3", ""agent_id_1"]
 }
 ```

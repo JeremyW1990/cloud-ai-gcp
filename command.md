@@ -14,8 +14,8 @@ docker push gcr.io/cloud-ai-431400/llm-communicator:latest
 docker build -t gcr.io/cloud-ai-431400/user:latest -f api/user/Dockerfile api/user &&
 docker push gcr.io/cloud-ai-431400/user:latest && terraform apply 
 
-docker build -t gcr.io/cloud-ai-431400/context:latest -f api/context/Dockerfile api/context &&
-docker push gcr.io/cloud-ai-431400/context:latest && terraform apply 
+docker build -t gcr.io/cloud-ai-431400/context:latest -f api/context/Dockerfile . &&
+docker push gcr.io/cloud-ai-431400/context:latest && terraform apply --auto-approve
 
 
 

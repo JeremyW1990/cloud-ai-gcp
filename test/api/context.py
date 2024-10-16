@@ -6,6 +6,13 @@ from datetime import datetime
 
 BASE_URL = 'https://cloud-ai-431400-gateway-2ywxoonu.uc.gateway.dev/v1'
 CONTEXT_API_WAIT_TIME = 10
+# Load secrets from secrets.auto.tfvars
+secrets = {}
+with open('../../secrets.auto.tfvars', 'r') as secrets_file:
+    for line in secrets_file:
+        key, value = line.strip().split(' = ')
+        secrets[key] = value.strip('"')
+
 
 # Load context.json
 with open('context.json', 'r') as file:
@@ -15,11 +22,11 @@ def test_create_context(user_id=None):
     url = f'{BASE_URL}/user/{user_id}/context'
     data = {
         **context_data,  
-        "vendor": "OpenAI"
+        "vendor": "OpenAI",
+        "api_key": secrets['openai_api_key']
     }
-
+    # print(data)
     response = requests.post(url, json=data)
-    
     print(f"Status Code: {response.status_code}")
     print(f"Response Content: {response.content}")
     
@@ -47,7 +54,7 @@ def test_get_context(user_id, context_id):
 def test_update_context(user_id, context_id):
     url = f'{BASE_URL}/user/{user_id}/context/{context_id}'
     update_data = {
-        "scenario": "Updated test scenario",
+        "instructions": "Updated test instructions",
         "agents": ["agent1", "agent2", "agent3"]
     }
     response = requests.put(url, json=update_data)
