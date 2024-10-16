@@ -9,45 +9,44 @@ import os
 
 class OpenAIStrategy(AIStrategy):
     def __init__(self):
-        self.client = None
+        # Removed self.client initialization
+        pass
 
     def initialize_client(self, api_key):
-        self.client = OpenAI(api_key=api_key)
-        return self.client
+        client = OpenAI(api_key=api_key)
+        return client
     
-    # def init_context(self, context):
-    #     try:
-    #         with open(context, 'r') as file:
-    #             yaml_data = yaml.safe_load(file)
+    def init_context(self, client, context_json):
+        try:
+            # Load JSON data directly from the provided JSON object
+            json_data = json.loads(context_json)
             
-    #         context_data = yaml_data.get('Context', [])
-    #         agents_data = yaml_data.get('Agents', [])
+            # Extract context information (assuming it's a single object)
+            context_info = json_data.get('context', {})
             
-    #         # Extract context information
-    #         context_info = [{"name": item['name'], "instructions": item['instructions']} for item in context_data]
+            # Extract agent information (assuming it's a list)
+            agents_data = json_data.get('agents', [])
+            agents_info = [{"name": agent['name'], "instructions": agent['instructions']} for agent in agents_data]
             
-    #         # Extract agent information
-    #         agents_info = [{"name": agent['name'], "instructions": agent['instructions']} for agent in agents_data]
+            # Initialize assistants
+            created_assistants = self.init_assistants(client, agents_info)
             
-    #         # Initialize assistants
-    #         created_assistants = self.init_assistants(agents_info)
-            
-    #         return context_info, created_assistants
-    #     except Exception as e:
-    #         print(f"Error initializing context: {str(e)}")
-    #         return None, None
+            return created_assistants
+        except Exception as e:
+            print(f"Error initializing context: {str(e)}")
+            return None, None
 
-    def init_assistants(self, agents):
+    def init_assistants(self, client, agents):
         created_assistants = []
         for agent in agents:
-            assistant_info = self.init_assistant(agent["name"], agent["instructions"])
+            assistant_info = self.init_assistant(client, agent["name"], agent["instructions"])
             if assistant_info:
                 created_assistants.append(assistant_info)
         return created_assistants
     
-    def init_assistant(self, name, instruction):
+    def init_assistant(self, client, name, instruction):
         try:
-            assistant = self.client.beta.assistants.create(
+            assistant = client.beta.assistants.create(
                 name=name,
                 tools=[],
                 instructions=instruction,
@@ -58,39 +57,39 @@ class OpenAIStrategy(AIStrategy):
             print(f"Error creating assistant {name}: {str(e)}")
             return None
 
-    def create_thread_with_context(self, context):
-        thread = self.client.beta.threads.create()
-        self.client.beta.threads.messages.create(
+    def create_thread_with_context(self, client, context):
+        thread = client.beta.threads.create()
+        client.beta.threads.messages.create(
             thread_id=thread.id, role="user", content=context
         )
         return thread
 
-    def create_thread_and_run(self, assistant_id, user_input):
-        thread = self.client.beta.threads.create()
-        run = self.submit_message(assistant_id, thread, user_input)
+    def create_thread_and_run(self, client, assistant_id, user_input):
+        thread = client.beta.threads.create()
+        run = self.submit_message(client, assistant_id, thread, user_input)
         return thread, run
 
-    def submit_message(self, assistant_id, thread, user_message):
-        self.client.beta.threads.messages.create(
+    def submit_message(self, client, assistant_id, thread, user_message):
+        client.beta.threads.messages.create(
             thread_id=thread.id, role="user", content=user_message
         )
-        response = self.client.beta.threads.runs.create(
+        response = client.beta.threads.runs.create(
             thread_id=thread.id,
             assistant_id=assistant_id,
         )
         return response
 
-    def wait_on_run(self, run, thread):
+    def wait_on_run(self, client, run, thread):
         while run.status == "queued" or run.status == "in_progress":
-            run = self.client.beta.threads.runs.retrieve(
+            run = client.beta.threads.runs.retrieve(
                 thread_id=thread.id,
                 run_id=run.id,
             )
             time.sleep(0.5)
         return run
 
-    def get_response(self, thread):
-        return self.client.beta.threads.messages.list(thread_id=thread.id, order="asc")
+    def get_response(self, client, thread):
+        return client.beta.threads.messages.list(thread_id=thread.id, order="asc")
 
     def get_latest_response(self, messages):
         messages_list = list(messages)

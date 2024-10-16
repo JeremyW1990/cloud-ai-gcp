@@ -148,6 +148,6 @@ def run_agent_api_tests():
 
 
 BASE_URL = 'https://cloud-ai-431400-gateway-2ywxoonu.uc.gateway.dev/v1'
-AGENT_API_WAIT_TIME = 20
+AGENT_API_WAIT_TIME = 10
 if __name__ == "__main__":
     run_agent_api_tests()

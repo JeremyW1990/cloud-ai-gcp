@@ -1,11 +1,11 @@
 {
-    "Context": [
+    "context": [
       {
         "name": "User Context",
         "instructions": "This is the context submitted by the user."
       }
     ],
-    "Agents": [
+    "agents": [
       {
         "name": "Coordinator Agent",
         "instructions": {

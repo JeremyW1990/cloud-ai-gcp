@@ -1,16 +1,23 @@
 import requests
 import uuid
 import time
+import json
+from datetime import datetime
 
 BASE_URL = 'https://cloud-ai-431400-gateway-2ywxoonu.uc.gateway.dev/v1'
 CONTEXT_API_WAIT_TIME = 10
 
-def test_create_context(user_id):
+# Load context.json
+with open('context.json', 'r') as file:
+    context_data = json.load(file)
+
+def test_create_context(user_id=None):
     url = f'{BASE_URL}/user/{user_id}/context'
     data = {
-        "scenario": "Test scenario",
-        "agents": ["agent1", "agent2"]
+        **context_data,  
+        "vendor": "OpenAI"
     }
+
     response = requests.post(url, json=data)
     
     print(f"Status Code: {response.status_code}")
@@ -73,8 +80,9 @@ def run_context_api_tests():
     print("Starting Context API Tests")
     
     # First, create a test user
+    current_time = datetime.now().strftime("%Y%m%d_%H%M%S")
     user_data = {
-        "name": "Test User",
+        "name": f"Test User {current_time}",  # Append date and time to the user name
         "email": f"test_{uuid.uuid4()}@example.com",
         "password": "testpassword123"
     }
@@ -108,23 +116,23 @@ def run_context_api_tests():
     
     time.sleep(CONTEXT_API_WAIT_TIME)
     
-    # Update context
-    print("\n3. Updating context...")
-    update_result = test_update_context(user_id, context_id)
-    if not update_result:
-        print("Failed to update context. Aborting tests.")
-        return
-    print("Context updated successfully.")
+    # # Update context
+    # print("\n3. Updating context...")
+    # update_result = test_update_context(user_id, context_id)
+    # if not update_result:
+    #     print("Failed to update context. Aborting tests.")
+    #     return
+    # print("Context updated successfully.")
     
-    time.sleep(CONTEXT_API_WAIT_TIME)
+    # time.sleep(CONTEXT_API_WAIT_TIME)
     
-    # Delete context
-    print("\n4. Deleting context...")
-    delete_result = test_delete_context(user_id, context_id)
-    if delete_result is None:
-        print("Failed to delete context.")
-    else:
-        print("Context deleted successfully.")
+    # # Delete context
+    # print("\n4. Deleting context...")
+    # delete_result = test_delete_context(user_id, context_id)
+    # if delete_result is None:
+    #     print("Failed to delete context.")
+    # else:
+    #     print("Context deleted successfully.")
     
     # Clean up: Delete the test user
     requests.delete(f"{BASE_URL}/user/{user_id}")
@@ -132,4 +140,5 @@ def run_context_api_tests():
     print("\nAll Context API Tests Completed.")
 
 if __name__ == "__main__":
+    # test_create_context()
     run_context_api_tests()

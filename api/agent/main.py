@@ -6,7 +6,7 @@ from firebase_admin import initialize_app, auth
 from google.auth.exceptions import DefaultCredentialsError
 import uuid
 import google.cloud.logging
-
+from api.agent.utils import create_agent_util
 # Setup Cloud Logging
 client = google.cloud.logging.Client()
 client.setup_logging()
@@ -71,16 +71,15 @@ def create_agent(user_id):
         agent_ref = db.collection('agents').document()
         agent_id = agent_ref.id
         
-        # Initialize the client and create the assistant using the strategy
+        # Initialize the client and create the assistant using the strategy and client
         api_key = data.get('api_key')  # Assume API key is provided in the request
         client = strategy.initialize_client(api_key)
-        vendor_agent = strategy.init_assistant(data.get('name'), data.get('description'))
+        vendor_agent_id, error = create_agent_util(client, {"name": data.get('name'), "description": data.get('description')}, strategy)
+        if error:
+            logging.error(f"Error creating agent: {error}")
+            return jsonify({"error": f"Error creating agent: {error}"}), 400
         
-        # Log the vendor_agent dictionary
-        logging.info(f"Vendor agent details: {vendor_agent}")
         
-        vendor_agent_id = vendor_agent.get('id') 
-        logging.info(f"Vendor agent ID: {vendor_agent_id}")
         
         # Prepare agent data
         agent_data = {
