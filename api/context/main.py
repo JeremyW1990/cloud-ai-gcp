@@ -6,7 +6,8 @@ from google.auth.exceptions import DefaultCredentialsError
 import uuid
 import logging
 from api.vendor.vendor_strategy import get_strategy
-from api.agent.utils import create_agent_util
+from api.utils.vendor import create_agent_util
+from api.utils.firestore import firestore_doc_set
 
 logging.basicConfig(level=logging.INFO)
 
@@ -54,10 +55,6 @@ def create_context(user_id):
         
         backend_user_id = mapping.to_dict()['backend_user_id']
         
-        # Generate a new context_id using Firestore's auto-generated ID
-        context_ref = db.collection('contexts').document()
-        backend_context_id = context_ref.id
-        
         # Generate a frontend context_id
         context_id = str(uuid.uuid4())
         
@@ -75,8 +72,6 @@ def create_context(user_id):
             logging.info(f"Successfully created agent with ID: {agent_id}")
             agent_ids.append(agent_id)
         
-
-        
         # Prepare context data
         context_data = {
             "context_id": context_id,
@@ -86,13 +81,17 @@ def create_context(user_id):
             "agents": agent_ids
         }
         
-        # Store the context data
-        context_ref.set(context_data)
+        # Use the utility function to store the context data
+        backend_context_id, error = firestore_doc_set(db, 'contexts', context_data)
+        if error:
+            logging.error(f"Error creating context in Firestore: {error}")
+            return jsonify({"error": f"Error creating context: {error}"}), 400
         
         # Create context_id to backend_context_id mapping
-        db.collection('context_id_mapping').document(context_id).set({
-            'backend_context_id': backend_context_id
-        })
+        _, error = firestore_doc_set(db, 'context_id_mapping', {'backend_context_id': backend_context_id}, context_id)
+        if error:
+            logging.error(f"Error creating context_id mapping in Firestore: {error}")
+            return jsonify({"error": f"Error creating context_id mapping: {error}"}), 400
         
         return jsonify({"context_id": context_id}), 201
     except Exception as e:

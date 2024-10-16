@@ -10,6 +10,7 @@ COPY api/vendor/vendor_strategy.py /app/api/vendor/vendor_strategy.py
 COPY api/vendor/base_strategy.py /app/api/vendor/base_strategy.py   
 COPY api/vendor/openai/main.py /app/api/vendor/openai/main.py
 COPY api/vendor/claude/main.py /app/api/vendor/claude/main.py
+COPY api/utils/ /app/api/utils/
 
 # Install any needed packages specified in requirements.txt
 RUN pip install --no-cache-dir -r api/agent/requirements.txt
