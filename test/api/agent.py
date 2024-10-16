@@ -1,6 +1,14 @@
 import requests
 import uuid
 import time
+import json
+
+# Load secrets from secrets.auto.tfvars
+secrets = {}
+with open('../../secrets.auto.tfvars', 'r') as secrets_file:
+    for line in secrets_file:
+        key, value = line.strip().split(' = ')
+        secrets[key] = value.strip('"')
 
  
 
@@ -9,7 +17,8 @@ def test_create_agent(user_id):
     data = {
         "vendor": "OpenAI",
         "name": "Test Agent",
-        "description": "This is a test agent"
+        "description": "This is a test agent",
+        "api_key": secrets['openai_api_key']
     }
     response = requests.post(url, json=data)
     
@@ -84,57 +93,61 @@ def run_agent_api_tests():
     
     user_id = user_response.json()['user_id']
     print(f"Test user created successfully. User ID: {user_id}")
-    
-    # Create agent
-    print("\n1. Creating agent...")
-    create_result = test_create_agent(user_id)
-    if not create_result or 'agent_id' not in create_result:
-        print("Failed to create agent. Aborting tests.")
-        return
-    
-    agent_id = create_result['agent_id']
-    print(f"Agent created successfully. Agent ID: {agent_id}")
-    
 
-    time.sleep(AGENT_API_WAIT_TIME)
-    
-    # Get agent
-    print("\n2. Getting agent...")
-    get_result = test_get_agent(user_id, agent_id)
-    if not get_result:
-        print("Failed to get agent. Aborting tests.")
-        return
-    print("Agent retrieved successfully.")
-    
+    try:
+        
+        # Create agent
+        print("\n1. Creating agent...")
+        create_result = test_create_agent(user_id)
+        if not create_result or 'agent_id' not in create_result:
+            print("Failed to create agent. Aborting tests.")
+            return
+        
+        agent_id = create_result['agent_id']
+        print(f"Agent created successfully. Agent ID: {agent_id}")
+        
 
-    time.sleep(AGENT_API_WAIT_TIME)
-    
-    # Update agent
-    print("\n3. Updating agent...")
-    update_result = test_update_agent(user_id, agent_id)
-    if not update_result:
-        print("Failed to update agent. Aborting tests.")
-        return
-    print("Agent updated successfully.")
-    
+        time.sleep(AGENT_API_WAIT_TIME)
+        
+        # Get agent
+        print("\n2. Getting agent...")
+        get_result = test_get_agent(user_id, agent_id)
+        if not get_result:
+            print("Failed to get agent. Aborting tests.")
+            return
+        print("Agent retrieved successfully.")
+        
 
-    time.sleep(AGENT_API_WAIT_TIME)
-    
-    # Delete agent
-    print("\n4. Deleting agent...")
-    delete_result = test_delete_agent(user_id, agent_id)
-    if not delete_result:
-        print("Failed to delete agent.")
-    else:
-        print("Agent deleted successfully.")
-    
-    # Clean up: Delete the test user
-    requests.delete(f"{BASE_URL}/user/{user_id}")
+        time.sleep(AGENT_API_WAIT_TIME)
+        
+        # Update agent
+        print("\n3. Updating agent...")
+        update_result = test_update_agent(user_id, agent_id)
+        if not update_result:
+            print("Failed to update agent. Aborting tests.")
+            return
+        print("Agent updated successfully.")
+        
+
+        time.sleep(AGENT_API_WAIT_TIME)
+        
+        # Delete agent
+        print("\n4. Deleting agent...")
+        delete_result = test_delete_agent(user_id, agent_id)
+        if not delete_result:
+            print("Failed to delete agent.")
+        else:
+            print("Agent deleted successfully.")
+    finally:
+        # Clean up: Delete the test user
+        requests.delete(f"{BASE_URL}/user/{user_id}")
+        print("\nTest user deleted successfully.")
+
     
     print("\nAll Agent API Tests Completed.")
 
 
 BASE_URL = 'https://cloud-ai-431400-gateway-2ywxoonu.uc.gateway.dev/v1'
-AGENT_API_WAIT_TIME = 20
+AGENT_API_WAIT_TIME = 10
 if __name__ == "__main__":
     run_agent_api_tests()

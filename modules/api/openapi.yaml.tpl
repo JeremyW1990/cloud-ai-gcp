@@ -201,7 +201,7 @@ paths:
           schema:
             type: object
             properties:
-              scenario:
+              instructions:
                 type: string
               agents:
                 type: array
@@ -243,7 +243,7 @@ paths:
             properties:
               context_id:
                 type: string
-              scenario:
+              instructions:
                 type: string
               agents:
                 type: array
@@ -271,7 +271,7 @@ paths:
           schema:
             type: object
             properties:
-              scenario:
+              instructions:
                 type: string
               agents:
                 type: array

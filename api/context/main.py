@@ -5,6 +5,8 @@ from firebase_admin import initialize_app, auth
 from google.auth.exceptions import DefaultCredentialsError
 import uuid
 import logging
+from api.vendor.vendor_strategy import get_strategy
+from api.agent.utils import create_agent_util
 
 logging.basicConfig(level=logging.INFO)
 
@@ -31,6 +33,72 @@ except DefaultCredentialsError:
 def before_request():
     if db is None:
         return jsonify({"error": "Database connection not available"}), 500
+    
+@app.route('/v1/user/<user_id>/context', methods=['POST'])
+def create_context(user_id):
+    logging.info(f"Creating context for user_id: {user_id}")
+    try:
+        data = request.get_json()
+        vendor = data.get('vendor')
+        
+        # Get the appropriate strategy based on the vendor
+        strategy = get_strategy(vendor)
+        
+        # Look up the Backend User ID
+        mapping_ref = db.collection('user_id_mapping').document(user_id)
+        mapping = mapping_ref.get()
+        
+        if not mapping.exists:
+            logging.warning(f"User mapping not found for user_id: {user_id}")
+            return jsonify({"error": "User not found"}), 404
+        
+        backend_user_id = mapping.to_dict()['backend_user_id']
+        
+        # Generate a new context_id using Firestore's auto-generated ID
+        context_ref = db.collection('contexts').document()
+        backend_context_id = context_ref.id
+        
+        # Generate a frontend context_id
+        context_id = str(uuid.uuid4())
+        
+        # Initialize the client and create the context using the strategy
+        api_key = data.get('api_key')  # Assume API key is provided in the request
+        client = strategy.initialize_client(api_key)
+
+        agent_ids = []
+        for agent in data.get('agents'):
+            logging.info(f"Processing agent: {agent}")
+            agent_id, error = create_agent_util(client, agent, strategy)
+            if error:
+                logging.error(f"Error creating agent: {error}")
+                return jsonify({"error": f"Error creating agent: {error}"}), 400
+            logging.info(f"Successfully created agent with ID: {agent_id}")
+            agent_ids.append(agent_id)
+        
+
+        
+        # Prepare context data
+        context_data = {
+            "context_id": context_id,
+            "user_id": user_id,
+            "backend_user_id": backend_user_id,
+            "instructions": data.get('context').get('instructions'),
+            "agents": agent_ids
+        }
+        
+        # Store the context data
+        context_ref.set(context_data)
+        
+        # Create context_id to backend_context_id mapping
+        db.collection('context_id_mapping').document(context_id).set({
+            'backend_context_id': backend_context_id
+        })
+        
+        return jsonify({"context_id": context_id}), 201
+    except Exception as e:
+        logging.error(f"An error occurred while creating context: {str(e)}")
+        return jsonify({"error": f"An error occurred: {str(e)}"}), 400
+
 
 @app.route('/v1/user/<user_id>/context/<context_id>', methods=['GET'])
 def get_context(user_id, context_id):
@@ -74,57 +142,13 @@ def get_context(user_id, context_id):
         # Return only the required fields
         return jsonify({
             "context_id": context_data['context_id'],
-            "scenario": context_data['scenario'],
+            "instructions": context_data['instructions'],
             "agents": context_data['agents']
         }), 200
     except Exception as e:
         logging.error(f"An error occurred while getting context: {str(e)}")
         return jsonify({"error": f"An error occurred: {str(e)}"}), 500
 
-@app.route('/v1/user/<user_id>/context', methods=['POST'])
-def create_context(user_id):
-    logging.info(f"Creating context for user_id: {user_id}")
-    try:
-        data = request.get_json()
-        
-        # Look up the Backend User ID
-        mapping_ref = db.collection('user_id_mapping').document(user_id)
-        mapping = mapping_ref.get()
-        
-        if not mapping.exists:
-            logging.warning(f"User mapping not found for user_id: {user_id}")
-            return jsonify({"error": "User not found"}), 404
-        
-        backend_user_id = mapping.to_dict()['backend_user_id']
-        
-        # Generate a new context_id using Firestore's auto-generated ID
-        context_ref = db.collection('contexts').document()
-        backend_context_id = context_ref.id
-        
-        # Generate a frontend context_id
-        context_id = str(uuid.uuid4())
-        
-        # Prepare context data
-        context_data = {
-            "context_id": context_id,
-            "user_id": user_id,
-            "backend_user_id": backend_user_id,
-            "scenario": data.get('scenario'),
-            "agents": data.get('agents', [])
-        }
-        
-        # Store the context data
-        context_ref.set(context_data)
-        
-        # Create context_id to backend_context_id mapping
-        db.collection('context_id_mapping').document(context_id).set({
-            'backend_context_id': backend_context_id
-        })
-        
-        return jsonify({"context_id": context_id}), 201
-    except Exception as e:
-        logging.error(f"An error occurred while creating context: {str(e)}")
-        return jsonify({"error": f"An error occurred: {str(e)}"}), 400
 
 @app.route('/v1/user/<user_id>/context/<context_id>', methods=['PUT'])
 def update_context(user_id, context_id):
@@ -169,7 +193,7 @@ def update_context(user_id, context_id):
         
         # Update the context data
         update_data = {
-            "scenario": data.get('scenario', context_data['scenario']),
+            "instructions": data.get('instructions', context_data['instructions']),
             "agents": data.get('agents', context_data['agents'])
         }
         

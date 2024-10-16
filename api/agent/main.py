@@ -1,10 +1,20 @@
+import sys
+import os
 from flask import Flask, request, jsonify
 from google.cloud import firestore
-import os
 from firebase_admin import initialize_app, auth
 from google.auth.exceptions import DefaultCredentialsError
 import uuid
+import google.cloud.logging
+from api.agent.utils import create_agent_util
+# Setup Cloud Logging
+client = google.cloud.logging.Client()
+client.setup_logging()
+
 import logging
+
+
+from api.vendor.vendor_strategy import get_strategy
 
 logging.basicConfig(level=logging.INFO)
 
@@ -24,7 +34,7 @@ try:
         database=os.environ.get('FIRESTORE_ID')
     )
 except DefaultCredentialsError:
-    print("Error: Unable to initialize Firestore client. Check your credentials.")
+    logging.error("Error: Unable to initialize Firestore client. Check your credentials.")
     db = None
 
 @app.before_request
@@ -32,11 +42,20 @@ def before_request():
     if db is None:
         return jsonify({"error": "Database connection not available"}), 500
 
+# Log startup information
+logging.info("Application starting")
+logging.info(f"Python path: {sys.path}")
+logging.info(f"Current working directory: {os.getcwd()}")
+
 @app.route('/v1/user/<user_id>/agent', methods=['POST'])
 def create_agent(user_id):
     logging.info(f"Creating agent for user_id: {user_id}")
     try:
         data = request.get_json()
+        vendor = data.get('vendor')
+        
+        # Get the appropriate strategy based on the vendor
+        strategy = get_strategy(vendor)
         
         # Look up the Backend User ID
         mapping_ref = db.collection('user_id_mapping').document(user_id)
@@ -52,8 +71,15 @@ def create_agent(user_id):
         agent_ref = db.collection('agents').document()
         agent_id = agent_ref.id
         
-        # Use hardcoded vendor_agent_id
-        vendor_agent_id = "mock_vendor_agent_id"
+        # Initialize the client and create the assistant using the strategy and client
+        api_key = data.get('api_key')  # Assume API key is provided in the request
+        client = strategy.initialize_client(api_key)
+        vendor_agent_id, error = create_agent_util(client, {"name": data.get('name'), "description": data.get('description')}, strategy)
+        if error:
+            logging.error(f"Error creating agent: {error}")
+            return jsonify({"error": f"Error creating agent: {error}"}), 400
+        
+        
         
         # Prepare agent data
         agent_data = {
@@ -61,9 +87,10 @@ def create_agent(user_id):
             "backend_user_id": backend_user_id,
             "vendor_agent_id": vendor_agent_id,
             "agent_id": agent_id,
-            "vendor": data.get('vendor'),
+            "vendor": vendor,
             "name": data.get('name'),
-            "description": data.get('description')
+            "description": data.get('description'),
+            "status": "active"
         }
         
         # Store the agent data
@@ -74,7 +101,11 @@ def create_agent(user_id):
             'vendor_agent_id': vendor_agent_id
         })
         
-        return jsonify({"agent_id": agent_id}), 201
+        return jsonify({
+            "agent_id": agent_id,
+            "vendor_agent_id": vendor_agent_id,
+            "status": agent_data["status"]
+        }), 201
     except Exception as e:
         logging.error(f"An error occurred while creating agent: {str(e)}")
         return jsonify({"error": f"An error occurred: {str(e)}"}), 500
@@ -113,7 +144,8 @@ def get_agent(user_id, agent_id):
             "vendor": agent_data['vendor'],
             "name": agent_data['name'],
             "description": agent_data['description'],
-            "vendor_agent_id": agent_data['vendor_agent_id']
+            "vendor_agent_id": agent_data['vendor_agent_id'],
+            "status": agent_data['status']
         }), 200
     except Exception as e:
         logging.error(f"An error occurred while getting agent: {str(e)}")
@@ -170,7 +202,10 @@ def update_agent(user_id, agent_id):
                 'vendor_agent_id': update_data['vendor_agent_id']
             })
         
-        return jsonify({"message": "Agent updated successfully"}), 200
+        return jsonify({
+            "message": "Agent updated successfully",
+            "status": agent_data['status']
+        }), 200
     except Exception as e:
         logging.error(f"An error occurred while updating agent: {str(e)}")
         return jsonify({"error": f"An error occurred: {str(e)}"}), 500
@@ -221,4 +256,5 @@ def delete_agent(user_id, agent_id):
 
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', 8080))
+    logging.info(f"Starting Flask app on port {port}")
     app.run(host='0.0.0.0', port=port)
