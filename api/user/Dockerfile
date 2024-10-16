@@ -1,17 +1,22 @@
-# Use the official Python image.
-# https://hub.docker.com/_/python
+# Use a base image that supports Python
 FROM python:3.9-slim
 
-# Set the working directory to /app
+# Set the working directory inside the container
 WORKDIR /app
 
-# Copy the current directory contents into the container at /app
-COPY . /app
+# Copy only the necessary files and folders
+COPY api/user /app/api/user
+COPY api/utils/ /app/api/utils/
+
 
 # Install any needed packages specified in requirements.txt
-RUN pip install --no-cache-dir -r requirements.txt
+RUN pip install --no-cache-dir -r api/user/requirements.txt
 
 # Make port 8080 available to the world outside this container
 EXPOSE 8080
 
-CMD ["python", "main.py"]
+# Set the PYTHONPATH environment variable
+ENV PYTHONPATH=/app
+
+# Set the default command to run the Python file
+CMD ["python", "api/user/main.py"]

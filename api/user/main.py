@@ -5,6 +5,7 @@ from firebase_admin import initialize_app, auth
 from google.auth.exceptions import DefaultCredentialsError
 import uuid
 import logging
+from api.utils.firestore import firestore_doc_set
 
 
 logging.basicConfig(level=logging.INFO)
@@ -57,23 +58,27 @@ def create_user():
         user_id = str(uuid.uuid4())
 
         # Store additional user data in Firestore
-        user_ref = db.collection('users').document(firebase_user.uid)
         user_data = {
             **data,
-            'user_id': user_id,
-            'backend_user_id': firebase_user.uid
+            'backend_user_id': firebase_user.uid,
+            'user_id': user_id
         }
-        user_ref.set(user_data)
+        
+        # Use the utility function to store the user data
+        _, error = firestore_doc_set(db, 'users', user_data, firebase_user.uid)
+        if error:
+            logging.error(f"Error creating user in Firestore: {error}")
+            return jsonify({"error": f"Error creating user: {error}"}), 500
 
-        # Create a mapping document
-        db.collection('user_id_mapping').document(user_id).set({
-            'backend_user_id': firebase_user.uid
-        })
+        # Create a mapping document using the utility function
+        _, error = firestore_doc_set(db, 'user_id_mapping', {'backend_user_id': firebase_user.uid}, user_id)
+        if error:
+            logging.error(f"Error creating user_id mapping in Firestore: {error}")
+            return jsonify({"error": f"Error creating user_id mapping: {error}"}), 500
 
         return jsonify({"user_id": user_id}), 201
     except Exception as e:
         return jsonify({"error": str(e)}), 500
-
 
 @app.route('/v1/user/<user_id>', methods=['GET'])
 def get_user(user_id):
@@ -108,7 +113,6 @@ def get_user(user_id):
     except Exception as e:
         logging.error(f"An error occurred while getting user: {str(e)}")
         return jsonify({"error": f"An error occurred: {str(e)}"}), 500
-    
 
 @app.route('/v1/user/<user_id>', methods=['PUT'])
 def update_user(user_id):
@@ -131,10 +135,14 @@ def update_user(user_id):
     
     # Update the user document
     logging.info(f"Updating user document for Backend User ID: {backend_user_id}")
-    user_ref = db.collection('users').document(backend_user_id)
     
     try:
-        user_ref.update(data)
+        # Use the utility function to update the user data
+        _, error = firestore_doc_set(db, 'users', data, backend_user_id)
+        if error:
+            logging.error(f"Error updating user in Firestore: {error}")
+            return jsonify({"error": f"Failed to update user: {error}"}), 500
+        
         logging.info(f"User document updated successfully")
     except Exception as e:
         logging.error(f"Error updating user document: {str(e)}")

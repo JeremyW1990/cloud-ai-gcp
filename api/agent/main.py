@@ -6,7 +6,8 @@ from firebase_admin import initialize_app, auth
 from google.auth.exceptions import DefaultCredentialsError
 import uuid
 import google.cloud.logging
-from api.agent.utils import create_agent_util
+from api.utils.vendor import create_agent_util
+from api.utils.firestore import firestore_doc_set
 # Setup Cloud Logging
 client = google.cloud.logging.Client()
 client.setup_logging()
@@ -67,9 +68,7 @@ def create_agent(user_id):
         
         backend_user_id = mapping.to_dict()['backend_user_id']
         
-        # Generate a new agent_id using Firestore's auto-generated ID
-        agent_ref = db.collection('agents').document()
-        agent_id = agent_ref.id
+
         
         # Initialize the client and create the assistant using the strategy and client
         api_key = data.get('api_key')  # Assume API key is provided in the request
@@ -79,27 +78,28 @@ def create_agent(user_id):
             logging.error(f"Error creating agent: {error}")
             return jsonify({"error": f"Error creating agent: {error}"}), 400
         
-        
-        
         # Prepare agent data
         agent_data = {
             "user_id": user_id,
             "backend_user_id": backend_user_id,
             "vendor_agent_id": vendor_agent_id,
-            "agent_id": agent_id,
             "vendor": vendor,
             "name": data.get('name'),
             "description": data.get('description'),
             "status": "active"
         }
         
-        # Store the agent data
-        agent_ref.set(agent_data)
+        # Use the utility function to store the agent data
+        agent_id, error = firestore_doc_set(db, 'agents', agent_data)
+        if error:
+            logging.error(f"Error creating agent in Firestore: {error}")
+            return jsonify({"error": f"Error creating agent: {error}"}), 400
         
-        # Create agent_id to vendor_agent_id mapping
-        db.collection('agent_id_mapping').document(agent_id).set({
-            'vendor_agent_id': vendor_agent_id
-        })
+        # Create agent_id to vendor_agent_id mapping using the same utility function
+        _, error = firestore_doc_set(db, 'agent_id_mapping', {'vendor_agent_id': vendor_agent_id}, agent_id)
+        if error:
+            logging.error(f"Error creating agent_id mapping in Firestore: {error}")
+            return jsonify({"error": f"Error creating agent_id mapping: {error}"}), 400
         
         return jsonify({
             "agent_id": agent_id,
@@ -194,13 +194,18 @@ def update_agent(user_id, agent_id):
             # Use hardcoded vendor_agent_id
             update_data['vendor_agent_id'] = "mock_vendor_agent_id"
         
-        agent_ref.update(update_data)
+        # Use the utility function to update the agent data
+        _, error = firestore_doc_set(db, 'agents', update_data, agent_id)
+        if error:
+            logging.error(f"Error updating agent in Firestore: {error}")
+            return jsonify({"error": f"Error updating agent: {error}"}), 400
         
         # Update agent_id to vendor_agent_id mapping if vendor_agent_id has changed
         if 'vendor_agent_id' in update_data:
-            db.collection('agent_id_mapping').document(agent_id).update({
-                'vendor_agent_id': update_data['vendor_agent_id']
-            })
+            _, error = firestore_doc_set(db, 'agent_id_mapping', {'vendor_agent_id': update_data['vendor_agent_id']}, agent_id)
+            if error:
+                logging.error(f"Error updating agent_id mapping in Firestore: {error}")
+                return jsonify({"error": f"Error updating agent_id mapping: {error}"}), 400
         
         return jsonify({
             "message": "Agent updated successfully",
