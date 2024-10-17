@@ -486,7 +486,7 @@ Deletes an existing context.
 
 Welcome to this AI chatroom, where a team of specialized AI agents collaborate to achieve results through natural language interactions.
 
-Within this chatroom, you will interact with a few distinct AI agents, each with a specific area of expertise. Each agent has specific responsibilities and communication protocols to ensure smooth collaboration and efficient task completion. As you engage with the chatroom, the agents will work together to address your needs. 
+Within this chatroom, user will interact with a few distinct AI agents, each with a specific area of expertise. Each agent has specific responsibilities and communication protocols to ensure smooth collaboration and efficient task completion. As user engages with the chatroom, the agents will work together to address user's needs. 
 The agent coordinator will guide the conversation, directing your queries to the appropriate specialist when necessary;
 The Code Agent will handle the code generation and updates;
 The External Info Monitor Agent will monitor the deployment process and provide feedback.
