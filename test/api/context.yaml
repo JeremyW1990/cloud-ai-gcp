@@ -1,9 +1,9 @@
-Context:
+context:
   - name: "User Context"
     instructions: >
       This is the context submitted by the user.
 
-Agents:
+agents:
   - name: "Coordinator Agent"
     instructions: >
       Description: You are responsible for managing the flow of communication between different AI agents

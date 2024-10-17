@@ -17,7 +17,7 @@ def test_create_agent(user_id):
     data = {
         "vendor": "OpenAI",
         "name": "Test Agent",
-        "description": "This is a test agent",
+        "instructions": "This is a test agent",
         "api_key": secrets['openai_api_key']
     }
     response = requests.post(url, json=data)
@@ -148,6 +148,6 @@ def run_agent_api_tests():
 
 
 BASE_URL = 'https://cloud-ai-431400-gateway-2ywxoonu.uc.gateway.dev/v1'
-AGENT_API_WAIT_TIME = 30
+AGENT_API_WAIT_TIME = 15
 if __name__ == "__main__":
     run_agent_api_tests()
