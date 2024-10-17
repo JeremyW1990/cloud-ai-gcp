@@ -44,12 +44,12 @@ class OpenAIStrategy(AIStrategy):
                 created_assistants.append(assistant_info)
         return created_assistants
     
-    def init_assistant(self, client, name, instruction):
+    def init_assistant(self, client, name, instructions):
         try:
             assistant = client.beta.assistants.create(
                 name=name,
                 tools=[],
-                instructions=instruction,
+                instructions=instructions,
                 model="gpt-4o-2024-05-13",
             )
             return {"name": name, f"{name.upper().replace(' ', '_')}_ID": assistant.id, "id": assistant.id}

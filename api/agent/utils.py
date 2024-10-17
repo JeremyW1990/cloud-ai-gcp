@@ -9,7 +9,7 @@ client.setup_logging()
 def create_agent_util(client, agent_data, strategy):
     try:
         
-        vendor_agent = strategy.init_assistant(client, agent_data.get('name'), agent_data.get('description'))
+        vendor_agent = strategy.init_assistant(client, agent_data.get('name'), agent_data.get('instructions'))
         
         # Log the vendor_agent dictionary
         logging.info(f"Vendor agent details: {vendor_agent}")

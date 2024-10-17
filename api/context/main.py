@@ -62,38 +62,60 @@ def create_context(user_id):
         api_key = data.get('api_key')  # Assume API key is provided in the request
         client = strategy.initialize_client(api_key)
 
+        vendor_agent_ids = []
         agent_ids = []
         for agent in data.get('agents'):
             logging.info(f"Processing agent: {agent}")
-            agent_id, error = create_agent_util(client, agent, strategy)
+            vendor_agent_id, error = create_agent_util(client, agent, strategy)
+
+
+            agent_data = {
+                "user_id": user_id,
+                "backend_user_id": backend_user_id,
+                "vendor_agent_id": vendor_agent_id,
+                "vendor": vendor,
+                "name": agent.get('name'),
+                "instructions": agent.get('instructions'),
+                "status": "active"
+            }
+            
+            # Use the utility function to store the agent data
+            agent_id, error = firestore_doc_set(db, 'agents', agent_data)
             if error:
-                logging.error(f"Error creating agent: {error}")
+                logging.error(f"Error creating agent in Firestore: {error}")
                 return jsonify({"error": f"Error creating agent: {error}"}), 400
-            logging.info(f"Successfully created agent with ID: {agent_id}")
+            
+            # Create agent_id to vendor_agent_id mapping using the same utility function
+            _, error = firestore_doc_set(db, 'agent_id_mapping', {'vendor_agent_id': vendor_agent_id}, agent_id)
+            if error:
+                logging.error(f"Error creating agent_id mapping in Firestore: {error}")
+                return jsonify({"error": f"Error creating agent_id mapping: {error}"}), 400
+            logging.info(f"Successfully created agent with vendor ID: {vendor_agent_id}")
+            vendor_agent_ids.append(vendor_agent_id)
             agent_ids.append(agent_id)
-        
         # Prepare context data
         context_data = {
             "context_id": context_id,
             "user_id": user_id,
             "backend_user_id": backend_user_id,
             "instructions": data.get('context').get('instructions'),
-            "agents": agent_ids
+            "vendor_agent_ids": vendor_agent_ids,
+            "agent_ids": agent_ids
         }
         
         # Use the utility function to store the context data
-        backend_context_id, error = firestore_doc_set(db, 'contexts', context_data)
+        backend_context_id, error = firestore_doc_set(db, 'contexts', context_data, merge=False)
         if error:
             logging.error(f"Error creating context in Firestore: {error}")
             return jsonify({"error": f"Error creating context: {error}"}), 400
         
         # Create context_id to backend_context_id mapping
-        _, error = firestore_doc_set(db, 'context_id_mapping', {'backend_context_id': backend_context_id}, context_id)
+        _, error = firestore_doc_set(db, 'context_id_mapping', {'backend_context_id': backend_context_id}, context_id, merge=False)
         if error:
             logging.error(f"Error creating context_id mapping in Firestore: {error}")
             return jsonify({"error": f"Error creating context_id mapping: {error}"}), 400
         
-        return jsonify({"context_id": context_id}), 201
+        return jsonify({"context_id": context_id, "backend_context_id": backend_context_id}), 201
     except Exception as e:
         logging.error(f"An error occurred while creating context: {str(e)}")
         return jsonify({"error": f"An error occurred: {str(e)}"}), 400
@@ -104,6 +126,7 @@ def get_context(user_id, context_id):
     logging.info(f"Retrieving context with context_id: {context_id} for user_id: {user_id}")
     try:
         # Look up the Backend User ID
+        logging.info(f"Looking up Backend User ID for user_id: {user_id}")
         user_mapping_ref = db.collection('user_id_mapping').document(user_id)
         user_mapping = user_mapping_ref.get()
         
@@ -112,8 +135,10 @@ def get_context(user_id, context_id):
             return jsonify({"error": "User not found"}), 404
         
         backend_user_id = user_mapping.to_dict()['backend_user_id']
+        logging.info(f"Found backend_user_id: {backend_user_id} for user_id: {user_id}")
         
         # Look up the Backend Context ID
+        logging.info(f"Looking up Backend Context ID for context_id: {context_id}")
         context_mapping_ref = db.collection('context_id_mapping').document(context_id)
         context_mapping = context_mapping_ref.get()
         
@@ -122,8 +147,10 @@ def get_context(user_id, context_id):
             return jsonify({"error": "Context not found"}), 404
         
         backend_context_id = context_mapping.to_dict()['backend_context_id']
+        logging.info(f"Found backend_context_id: {backend_context_id} for context_id: {context_id}")
         
         # Fetch the context data
+        logging.info(f"Fetching context data for backend_context_id: {backend_context_id}")
         context_ref = db.collection('contexts').document(backend_context_id)
         context = context_ref.get()
         
@@ -132,6 +159,7 @@ def get_context(user_id, context_id):
             return jsonify({"error": "Context not found"}), 404
         
         context_data = context.to_dict()
+        logging.info(f"Fetched context data: {context_data}")
         
         # Check if the context belongs to the user
         if context_data['backend_user_id'] != backend_user_id:
@@ -139,10 +167,11 @@ def get_context(user_id, context_id):
             return jsonify({"error": "Context not found"}), 404
         
         # Return only the required fields
+        logging.info(f"Returning context data for context_id: {context_id}")
         return jsonify({
             "context_id": context_data['context_id'],
             "instructions": context_data['instructions'],
-            "agents": context_data['agents']
+            "agent_ids": context_data['agent_ids']
         }), 200
     except Exception as e:
         logging.error(f"An error occurred while getting context: {str(e)}")
@@ -192,11 +221,14 @@ def update_context(user_id, context_id):
         
         # Update the context data
         update_data = {
-            "instructions": data.get('instructions', context_data['instructions']),
-            "agents": data.get('agents', context_data['agents'])
+            **data,
         }
         
-        context_ref.update(update_data)
+        # Use the utility function to update the context data
+        _, error = firestore_doc_set(db, 'contexts', update_data, backend_context_id, merge=True)
+        if error:
+            logging.error(f"Error updating context in Firestore: {error}")
+            return jsonify({"error": f"Failed to update context: {error}"}), 500
         
         return jsonify({"message": "Context updated successfully"}), 200
     except Exception as e:

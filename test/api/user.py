@@ -128,5 +128,5 @@ def run_user_api_tests():
 # Run the tests
 if __name__ == "__main__":
     BASE_URL = 'https://cloud-ai-431400-gateway-2ywxoonu.uc.gateway.dev/v1'
-    USER_API_WAIT_TIME = 15
+    USER_API_WAIT_TIME = 10
     run_user_api_tests()

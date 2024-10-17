@@ -73,7 +73,7 @@ def create_agent(user_id):
         # Initialize the client and create the assistant using the strategy and client
         api_key = data.get('api_key')  # Assume API key is provided in the request
         client = strategy.initialize_client(api_key)
-        vendor_agent_id, error = create_agent_util(client, {"name": data.get('name'), "description": data.get('description')}, strategy)
+        vendor_agent_id, error = create_agent_util(client, {"name": data.get('name'), "instructions": data.get('instructions')}, strategy)
         if error:
             logging.error(f"Error creating agent: {error}")
             return jsonify({"error": f"Error creating agent: {error}"}), 400
@@ -85,7 +85,7 @@ def create_agent(user_id):
             "vendor_agent_id": vendor_agent_id,
             "vendor": vendor,
             "name": data.get('name'),
-            "description": data.get('description'),
+            "instructions": data.get('instructions'),
             "status": "active"
         }
         
@@ -143,7 +143,7 @@ def get_agent(user_id, agent_id):
         return jsonify({
             "vendor": agent_data['vendor'],
             "name": agent_data['name'],
-            "description": agent_data['description'],
+            "instructions": agent_data['instructions'],
             "vendor_agent_id": agent_data['vendor_agent_id'],
             "status": agent_data['status']
         }), 200
@@ -186,7 +186,7 @@ def update_agent(user_id, agent_id):
         update_data = {
             "vendor": data.get('vendor', agent_data['vendor']),
             "name": data.get('name', agent_data['name']),
-            "description": data.get('description', agent_data['description'])
+            "instructions": data.get('instructions', agent_data['instructions'])
         }
         
         # If vendor has changed, update vendor_agent_id

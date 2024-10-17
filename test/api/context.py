@@ -2,6 +2,7 @@ import requests
 import uuid
 import time
 import json
+import yaml  # Add this import
 from datetime import datetime
 
 BASE_URL = 'https://cloud-ai-431400-gateway-2ywxoonu.uc.gateway.dev/v1'
@@ -55,7 +56,6 @@ def test_update_context(user_id, context_id):
     url = f'{BASE_URL}/user/{user_id}/context/{context_id}'
     update_data = {
         "instructions": "Updated test instructions",
-        "agents": ["agent1", "agent2", "agent3"]
     }
     response = requests.put(url, json=update_data)
     
@@ -109,7 +109,10 @@ def run_context_api_tests():
         return
     
     context_id = create_result['context_id']
-    print(f"Context created successfully. Context ID: {context_id}")
+    backend_context_id = create_result['backend_context_id']
+    print(f"Context created successfully.")
+    print(f"Context ID: {context_id}")
+    print(f"Backend Context ID: {backend_context_id}")
     
     time.sleep(CONTEXT_API_WAIT_TIME)
     
@@ -123,23 +126,23 @@ def run_context_api_tests():
     
     time.sleep(CONTEXT_API_WAIT_TIME)
     
-    # # Update context
-    # print("\n3. Updating context...")
-    # update_result = test_update_context(user_id, context_id)
-    # if not update_result:
-    #     print("Failed to update context. Aborting tests.")
-    #     return
-    # print("Context updated successfully.")
+    # Update context
+    print("\n3. Updating context...")
+    update_result = test_update_context(user_id, context_id)
+    if not update_result:
+        print("Failed to update context. Aborting tests.")
+        return
+    print("Context updated successfully.")
     
-    # time.sleep(CONTEXT_API_WAIT_TIME)
+    time.sleep(CONTEXT_API_WAIT_TIME)
     
-    # # Delete context
-    # print("\n4. Deleting context...")
-    # delete_result = test_delete_context(user_id, context_id)
-    # if delete_result is None:
-    #     print("Failed to delete context.")
-    # else:
-    #     print("Context deleted successfully.")
+    # Delete context
+    print("\n4. Deleting context...")
+    delete_result = test_delete_context(user_id, context_id)
+    if delete_result is None:
+        print("Failed to delete context.")
+    else:
+        print("Context deleted successfully.")
     
     # Clean up: Delete the test user
     requests.delete(f"{BASE_URL}/user/{user_id}")

@@ -244,7 +244,7 @@ Retrieves an existing agent's information. It will check if the agent belongs to
 {
   "vendor": "OpenAI",
   "name": "TravelBot",
-  "description": "An AI agent specialized in travel planning, providing personalized itineraries and recommendations based on user preferences."
+  "instructions": "An AI agent specialized in travel planning, providing personalized itineraries and recommendations based on user preferences."
 }
 ```
 
@@ -261,7 +261,7 @@ Creates a new agent.
   "user_id": "user_id_1",
   "vendor": "OpenAI",
   "name": "TravelBot",
-  "description": "An AI agent specialized in travel planning, providing personalized itineraries and recommendations based on user preferences."
+  "instructions": "An AI agent specialized in travel planning, providing personalized itineraries and recommendations based on user preferences."
 }
 ```
 
@@ -276,7 +276,7 @@ Creates a new agent.
   "agent_id": "agent_id_1",
   "vendor": "OpenAI",
   "name": "TravelBot",
-  "description": "An AI agent specialized in travel planning, providing personalized itineraries and recommendations based on user preferences."
+  "instructions": "An AI agent specialized in travel planning, providing personalized itineraries and recommendations based on user preferences."
 }
 ```
 

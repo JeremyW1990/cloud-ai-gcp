@@ -12,6 +12,13 @@ docker build -t gcr.io/cloud-ai-431400/llm-communicator:latest . &&
 docker push gcr.io/cloud-ai-431400/llm-communicator:latest
 
 docker build -t gcr.io/cloud-ai-431400/user:latest -f api/user/Dockerfile . &&
+docker push gcr.io/cloud-ai-431400/user:latest &&
+docker build -t gcr.io/cloud-ai-431400/agent:latest -f api/agent/Dockerfile . &&
+docker push gcr.io/cloud-ai-431400/agent:latest &&
+docker build -t gcr.io/cloud-ai-431400/context:latest -f api/context/Dockerfile . &&
+docker push gcr.io/cloud-ai-431400/context:latest && terraform apply --auto-approve
+
+docker build -t gcr.io/cloud-ai-431400/user:latest -f api/user/Dockerfile . &&
 docker push gcr.io/cloud-ai-431400/user:latest && terraform apply --auto-approve
 
 docker build -t gcr.io/cloud-ai-431400/agent:latest -f api/agent/Dockerfile . &&
