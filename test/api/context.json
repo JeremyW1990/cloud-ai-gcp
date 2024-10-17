@@ -1,8 +1,8 @@
 {
     "context": 
       {
-        "name": "User Context",
-        "instructions": "This is the context submitted by the user."
+        "name": "AI Chatroom",
+        "instructions": "Welcome to this AI chatroom, where a team of specialized AI agents collaborate to achieve results through natural language interactions.\nWithin this chatroom, user will interact with a few distinct AI agents, each with a specific area of expertise. Each agent has specific responsibilities and communication protocols to ensure smooth collaboration and efficient task completion. As user engages with the chatroom, the agents will work together to address user's needs.\nThe agent coordinator will guide the conversation, directing your queries to the appropriate specialist when necessary;\nThe Code Agent will handle the code generation and updates;\nThe External Info Monitor Agent will monitor the deployment process and provide feedback.\nPlease feel free to start your query, and the agents will be ready to assist you in building and managing your code repository through this collaborative effort."
       }
     ,
     "agents": [

@@ -50,3 +50,8 @@ variable "api_cloud_runs" {
   description = "List of API Cloud Run services to create"
   type        = list(string)
 }
+
+# variable "chat_history_bucket" {
+#   description = "Bucket to store chat history"
+#   type = string
+# }

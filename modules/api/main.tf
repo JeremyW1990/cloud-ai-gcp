@@ -50,6 +50,11 @@ resource "google_cloud_run_service" "api_service" {
           name  = "FIRESTORE_REGION"
           value = var.region
         }
+
+        env {
+          name  = "BUCKET_NAME"
+          value = var.chat_history_bucket
+        }
       }
     }
   }
