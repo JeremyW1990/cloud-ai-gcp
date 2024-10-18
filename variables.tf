@@ -50,3 +50,53 @@ variable "api_cloud_runs" {
   description = "List of API Cloud Run services to create"
   type        = list(string)
 }
+
+variable "orchestrator" {
+  description = "Name of the orchestrator Cloud Run service"
+  type        = string
+}
+
+variable "llm_communicator" {
+  description = "Name of the LLM communicator Cloud Run service"
+  type        = string
+}
+
+variable "embedding_search" {
+  description = "Name of the embedding search Cloud Run service"
+  type        = string
+}
+
+variable "data_processor" {
+  description = "Name of the data processor Cloud Run service"
+  type        = string
+}
+
+variable "cloud_runs" {
+  description = "List of Cloud Run services"
+  type        = list(string)
+}
+
+variable "pending_reasoning_topic" {
+  description = "Name of the pending reasoning Pub/Sub topic"
+  type        = string
+}
+
+variable "vector_search_topic" {
+  description = "Name of the vector search Pub/Sub topic"
+  type        = string
+}
+
+variable "llm_request_topic" {
+  description = "Name of the LLM request Pub/Sub topic"
+  type        = string
+}
+
+variable "llm_response_topic" {
+  description = "Name of the LLM response Pub/Sub topic"
+  type        = string
+}
+
+variable "pub_subs" {
+  description = "List of Pub/Sub topics"
+  type        = list(string)
+}
