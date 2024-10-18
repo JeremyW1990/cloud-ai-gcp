@@ -566,6 +566,9 @@ Determine the next assistant to take over based on the latest interaction:
   - Use 'NEXT_AGENT: "NONE"' to pause or end the interaction.
 - Maintain a vigilant watch on all external outputs and provide timely updates and insights as needed, adhering to the specified response format.
 
+## Technical Improvement
+- PUb/sub: Circuit Breaker, Retries with Backoff, Dead-letter Topic, Tracibility  
+
 
 ## Getting Started
 
