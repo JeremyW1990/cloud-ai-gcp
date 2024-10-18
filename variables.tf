@@ -19,16 +19,6 @@ variable "credentials_file" {
   description = "Path to the Google Cloud service account key file"
 }
 
-variable "workflow" {
-  type = list(object({
-    name                 = string
-    type                 = string
-    pubsub_pull_endpoint = optional(string)
-    pubsub_push_endpoint = optional(string)
-  }))
-  description = "A list of workflow items (Cloud Run services or Pub/Sub topics)"
-}
-
 variable "openai_api_key" {
   description = "OpenAI API Key"
   type        = string
@@ -71,11 +61,6 @@ variable "data_processor" {
   type        = string
 }
 
-variable "cloud_runs" {
-  description = "List of Cloud Run services"
-  type        = list(string)
-}
-
 variable "pending_reasoning_topic" {
   description = "Name of the pending reasoning Pub/Sub topic"
   type        = string
@@ -96,7 +81,4 @@ variable "llm_response_topic" {
   type        = string
 }
 
-variable "pub_subs" {
-  description = "List of Pub/Sub topics"
-  type        = list(string)
-}
+

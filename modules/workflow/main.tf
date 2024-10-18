@@ -1,11 +1,6 @@
-locals {
-  cloud_run_services = { for item in var.workflow : item.name => item if item.type == "cloud_run" }
-  pubsub_topics = { for item in var.workflow : item.name => item if item.type == "pubsub" }
-}
-
 resource "google_cloud_run_service" "this" {
-  for_each = local.cloud_run_services
-  name     = each.key
+  for_each = toset(var.cloud_runs)
+  name     = each.value
   location = var.region
 
   template {
@@ -23,13 +18,13 @@ resource "google_cloud_run_service" "this" {
           name  = "PROJECT_ID"
           value = var.project_id
         }
-        env {
-          name  = "PUBSUB_PULL_ENDPOINT"
-          value = each.value.pubsub_pull_endpoint
-        }
-        env {
-          name  = "PUBSUB_PUSH_ENDPOINT"
-          value = each.value.pubsub_push_endpoint
+
+        dynamic "env" {
+          for_each = var.pub_subs
+          content {
+            name  = env.value
+            value = env.value
+          }
         }
       }
     }
@@ -42,17 +37,20 @@ resource "google_cloud_run_service" "this" {
 }
 
 resource "google_pubsub_topic" "this" {
-  for_each = local.pubsub_topics
-  name     = each.key
+  for_each = toset(var.pub_subs)
+  name     = each.value
 }
 
 resource "google_pubsub_subscription" "this" {
-  for_each = local.pubsub_topics
-  name     = "${each.key}-subscription"
-  topic    = google_pubsub_topic.this[each.key].name
+  for_each = toset(var.pub_subs)
+  name     = each.value
+  topic    = google_pubsub_topic.this[each.value].name
 
   ack_deadline_seconds = 600
   
   // Add message retention duration
   message_retention_duration = "604800s" // 7 days
 }
+
+
+
