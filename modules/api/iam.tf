@@ -27,3 +27,11 @@ resource "google_cloud_run_service_iam_member" "noauth" {
   role     = "roles/run.invoker"
   member   = "allUsers"
 }
+
+# Allow Cloud Run to access Cloud Storage
+resource "google_project_iam_member" "cloud_storage_access" {
+  for_each = toset(var.api_cloud_runs)
+  project  = var.project_id
+  role     = "roles/storage.objectAdmin"
+  member   = "serviceAccount:${google_service_account.api_service_account[each.key].email}"
+}

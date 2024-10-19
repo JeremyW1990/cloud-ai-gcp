@@ -36,6 +36,7 @@ module "api" {
   api_cloud_runs   = var.api_cloud_runs
   project_id       = var.project_id
   firestore_id     = google_firestore_database.main.name
+  chat_history_bucket      = google_storage_bucket.chat_history_bucket.name
   region           = var.region
   depends_on = [google_project_service.apigateway, google_project_service.service_control] 
 }

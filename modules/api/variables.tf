@@ -17,3 +17,8 @@ variable "firestore_id" {
   description = "The ID of the Firestore database"
   type        = string
 }
+
+variable "chat_history_bucket" {
+  description = "Bucket to store chat history"
+  type = string
+}

@@ -82,3 +82,7 @@ variable "llm_response_topic" {
 }
 
 
+# variable "chat_history_bucket" {
+#   description = "Bucket to store chat history"
+#   type = string
+# }

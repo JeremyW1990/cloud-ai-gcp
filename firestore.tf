@@ -1,3 +1,4 @@
+
 resource "google_firestore_database" "main" {
   name        = "${var.project_id}-metadata"
   project     = var.project_id

@@ -8,6 +8,9 @@ import logging
 from api.vendor.vendor_strategy import get_strategy
 from api.utils.vendor import create_agent_util
 from api.utils.firestore import firestore_doc_set
+from api.utils.bucket import upload_content_to_bucket
+from api.utils.context import json_to_final_yaml_context
+import json
 
 logging.basicConfig(level=logging.INFO)
 
@@ -41,7 +44,7 @@ def create_context(user_id):
     try:
         data = request.get_json()
         vendor = data.get('vendor')
-        
+        logging.info(f"data: {data}")
         # Get the appropriate strategy based on the vendor
         strategy = get_strategy(vendor)
         
@@ -93,6 +96,8 @@ def create_context(user_id):
             logging.info(f"Successfully created agent with vendor ID: {vendor_agent_id}")
             vendor_agent_ids.append(vendor_agent_id)
             agent_ids.append(agent_id)
+
+
         # Prepare context data
         context_data = {
             "context_id": context_id,
@@ -114,6 +119,12 @@ def create_context(user_id):
         if error:
             logging.error(f"Error creating context_id mapping in Firestore: {error}")
             return jsonify({"error": f"Error creating context_id mapping: {error}"}), 400
+        
+        yaml_context = json_to_final_yaml_context(data)
+        
+        upload_content_to_bucket(os.environ.get('BUCKET_NAME'), f'{backend_user_id}/{backend_context_id}/context.yaml', yaml_context)
+
+        
         
         return jsonify({"context_id": context_id, "backend_context_id": backend_context_id}), 201
     except Exception as e:

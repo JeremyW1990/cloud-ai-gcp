@@ -1,5 +1,6 @@
 import os
 from google.cloud import firestore
+from google.cloud import storage
 from google.oauth2 import service_account
 import firebase_admin
 from firebase_admin import credentials, auth
@@ -59,8 +60,34 @@ def delete_all_firebase_users():
             auth.delete_user(user.uid)
         page = page.get_next_page()
 
+def purge_bucket(bucket_name):
+    """
+    Delete all files and folders (prefixes) in the specified Google Cloud Storage bucket.
+
+    :param bucket_name: Name of the bucket to delete files and folders from.
+    """
+    # Create credentials using the service account key
+    credentials = service_account.Credentials.from_service_account_file(service_account_path)
+
+    # Initialize a client with the specified credentials
+    storage_client = storage.Client(credentials=credentials)
+
+    # Get the bucket
+    bucket = storage_client.get_bucket(bucket_name)
+
+    # List all blobs in the bucket
+    blobs = bucket.list_blobs()
+
+    # Delete each blob
+    for blob in blobs:
+        print(f'Deleting blob: {blob.name}')
+        blob.delete()
+
 # Call the function to delete all documents in all collections
 delete_all_collections()
 
 # Call the function to delete all users
 delete_all_firebase_users()
+
+# Call the function to delete all files and folders in the specified bucket
+purge_bucket('cloud-ai-431400-chat')
