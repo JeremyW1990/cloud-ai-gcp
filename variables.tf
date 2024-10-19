@@ -19,16 +19,6 @@ variable "credentials_file" {
   description = "Path to the Google Cloud service account key file"
 }
 
-variable "workflow" {
-  type = list(object({
-    name                 = string
-    type                 = string
-    pubsub_pull_endpoint = optional(string)
-    pubsub_push_endpoint = optional(string)
-  }))
-  description = "A list of workflow items (Cloud Run services or Pub/Sub topics)"
-}
-
 variable "openai_api_key" {
   description = "OpenAI API Key"
   type        = string
@@ -50,6 +40,47 @@ variable "api_cloud_runs" {
   description = "List of API Cloud Run services to create"
   type        = list(string)
 }
+
+variable "orchestrator" {
+  description = "Name of the orchestrator Cloud Run service"
+  type        = string
+}
+
+variable "llm_communicator" {
+  description = "Name of the LLM communicator Cloud Run service"
+  type        = string
+}
+
+variable "embedding_search" {
+  description = "Name of the embedding search Cloud Run service"
+  type        = string
+}
+
+variable "data_processor" {
+  description = "Name of the data processor Cloud Run service"
+  type        = string
+}
+
+variable "pending_reasoning_topic" {
+  description = "Name of the pending reasoning Pub/Sub topic"
+  type        = string
+}
+
+variable "vector_search_topic" {
+  description = "Name of the vector search Pub/Sub topic"
+  type        = string
+}
+
+variable "llm_request_topic" {
+  description = "Name of the LLM request Pub/Sub topic"
+  type        = string
+}
+
+variable "llm_response_topic" {
+  description = "Name of the LLM response Pub/Sub topic"
+  type        = string
+}
+
 
 # variable "chat_history_bucket" {
 #   description = "Bucket to store chat history"

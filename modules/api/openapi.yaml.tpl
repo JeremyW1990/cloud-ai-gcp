@@ -303,3 +303,123 @@ paths:
           description: "No Content"
         404:
           description: "Context not found"
+
+  /v1/user/{user_id}/thread:
+    post:
+      operationId: "createThread"
+      x-google-backend:
+        address: "${thread_service_url}"
+        path_translation: APPEND_PATH_TO_ADDRESS
+      parameters:
+        - name: user_id
+          in: path
+          required: true
+          type: string
+        - name: body
+          in: body
+          required: true
+          schema:
+            type: object
+            properties:
+              instructions:
+                type: string
+              agents:
+                type: array
+                items:
+                  type: string
+      responses:
+        201:
+          description: "Thread created successfully"
+          schema:
+            type: object
+            properties:
+              thread_id:
+                type: string
+        400:
+          description: "Bad Request"
+        404:
+          description: "User not found"
+
+  /v1/user/{user_id}/thread/{thread_id}:
+    get:
+      operationId: "getThreadById"
+      x-google-backend:
+        address: "${thread_service_url}"
+        path_translation: APPEND_PATH_TO_ADDRESS
+      parameters:
+        - name: user_id
+          in: path
+          required: true
+          type: string
+        - name: thread_id
+          in: path
+          required: true
+          type: string
+      responses:
+        200:
+          description: "Successful response"
+          schema:
+            type: object
+            properties:
+              thread_id:
+                type: string
+              instructions:
+                type: string
+              agents:
+                type: array
+                items:
+                  type: string
+        404:
+          description: "Thread not found"
+    put:
+      operationId: "updateThreadById"
+      x-google-backend:
+        address: "${thread_service_url}"
+        path_translation: APPEND_PATH_TO_ADDRESS
+      parameters:
+        - name: user_id
+          in: path
+          required: true
+          type: string
+        - name: thread_id
+          in: path
+          required: true
+          type: string
+        - name: body
+          in: body
+          required: true
+          schema:
+            type: object
+            properties:
+              instructions:
+                type: string
+              agents:
+                type: array
+                items:
+                  type: string
+      responses:
+        200:
+          description: "Thread updated successfully"
+        400:
+          description: "Bad Request"
+        404:
+          description: "Thread not found"
+    delete:
+      operationId: "deleteThreadById"
+      x-google-backend:
+        address: "${thread_service_url}"
+        path_translation: APPEND_PATH_TO_ADDRESS
+      parameters:
+        - name: user_id
+          in: path
+          required: true
+          type: string
+        - name: thread_id
+          in: path
+          required: true
+          type: string
+      responses:
+        204:
+          description: "No Content"
+        404:
+          description: "Thread not found"
