@@ -12,6 +12,7 @@ data "template_file" "yaml_file" {
     user_service_url = local.api_services["user"]
     agent_service_url = local.api_services["agent"]
     context_service_url = local.api_services["context"]
+    thread_service_url = local.api_services["thread"]
   }
 }
 

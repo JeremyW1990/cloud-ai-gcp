@@ -21,6 +21,9 @@ docker push gcr.io/cloud-ai-431400/context:latest && terraform apply --auto-appr
 docker build -t gcr.io/cloud-ai-431400/user:latest -f api/user/Dockerfile . &&
 docker push gcr.io/cloud-ai-431400/user:latest && terraform apply --auto-approve
 
+docker build -t gcr.io/cloud-ai-431400/thread:latest -f api/thread/Dockerfile . &&
+docker push gcr.io/cloud-ai-431400/thread:latest && terraform apply --auto-approve
+
 docker build -t gcr.io/cloud-ai-431400/agent:latest -f api/agent/Dockerfile . &&
 docker push gcr.io/cloud-ai-431400/agent:latest && terraform apply --auto-approve
 

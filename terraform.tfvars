@@ -20,5 +20,5 @@ llm_request_topic = "llm-request-topic"
 llm_response_topic = "llm-response-topic"
 
 
-firestore_collections = ["users", "agents", "threads", "contexts", "user_id_mapping", "agent_id_mapping", "context_id_mapping"]
-api_cloud_runs = ["user", "agent", "context"]
+firestore_collections = ["users", "agents", "threads", "contexts", "user_id_mapping", "agent_id_mapping", "context_id_mapping", "thread_id_mapping"]
+api_cloud_runs = ["user", "agent", "context", "thread"]
