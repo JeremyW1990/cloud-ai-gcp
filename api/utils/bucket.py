@@ -31,5 +31,37 @@ def upload_content_to_bucket(bucket_name, destination, content):
 
     print(f"Content uploaded to {destination}.")
 
+
+def retrieve_content_from_bucket(bucket_name, source):
+    """
+    Retrieves content from a GCP bucket.
+
+    :param bucket_name: The name of the bucket.
+    :param source: The path in the bucket where the content is stored.
+    :return: The content retrieved from the bucket.
+    """
+    logging.info(f"Starting retrieve_content_from_bucket with bucket_name={bucket_name}, "
+                 f"source={source}")
+
+    # Initialize a storage client
+    storage_client = storage.Client()
+    logging.info("Initialized storage client.")
+
+    # Get the bucket
+    bucket = storage_client.bucket(bucket_name)
+    logging.info(f"Retrieved bucket: {bucket_name}")
+
+    # Create a blob object from the bucket
+    blob = bucket.blob(source)
+    logging.info(f"Created blob object for source: {source}")
+
+    # Download the content from the bucket
+    content = blob.download_as_text()
+    logging.info("Downloaded content from the bucket.")
+
+    print(f"Content retrieved from {source}.")
+    return content
+
 # Example usage
-# upload_content_to_gcp_bucket('my-bucket', 'path/to/destination/file.txt', 'This is the content to upload.')
+# content = retrieve_content_from_bucket('my-bucket', 'path/to/source/file.txt')
+# print(content)

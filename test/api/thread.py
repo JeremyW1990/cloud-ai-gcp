@@ -23,7 +23,8 @@ def test_create_thread(user_id=None):
     data = {
         "vendor": "OpenAI",
         "api_key": secrets['openai_api_key'],
-        "context": "Mock context"
+        "context_id": "Mock context",
+        "user_init_message": "Hello, how are you?"
     }
     response = requests.post(url, json=data)
     print(f"Status Code: {response.status_code}")

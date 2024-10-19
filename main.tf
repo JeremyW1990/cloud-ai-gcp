@@ -12,8 +12,6 @@ locals {
     # var.embedding_search,
     # var.data_processor
   ]
-
-
 }
 
 
