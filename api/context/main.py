@@ -98,7 +98,7 @@ def create_context(user_id):
             agent_ids.append(agent_id)
 
 
-        # Prepare context data
+
         context_data = {
             "context_id": context_id,
             "user_id": user_id,
@@ -110,6 +110,7 @@ def create_context(user_id):
         
         # Use the utility function to store the context data
         backend_context_id, error = firestore_doc_set(db, 'contexts', context_data, merge=False)
+
         if error:
             logging.error(f"Error creating context in Firestore: {error}")
             return jsonify({"error": f"Error creating context: {error}"}), 400
@@ -119,12 +120,12 @@ def create_context(user_id):
         if error:
             logging.error(f"Error creating context_id mapping in Firestore: {error}")
             return jsonify({"error": f"Error creating context_id mapping: {error}"}), 400
-        
+
+        # Prepare context data
         yaml_context = json_to_final_yaml_context(data)
         
         upload_content_to_bucket(os.environ.get('BUCKET_NAME'), f'{backend_user_id}/{backend_context_id}/context.yaml', yaml_context)
 
-        
         
         return jsonify({"context_id": context_id, "backend_context_id": backend_context_id}), 201
     except Exception as e:

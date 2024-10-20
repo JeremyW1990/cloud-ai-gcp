@@ -22,17 +22,28 @@ with open('../../secrets.auto.tfvars', 'r') as secrets_file:
 def test_create_context(user_id=None):
     url = f'{BASE_URL}/user/{user_id}/context'
     
-    # Load context.yaml
-    with open('context.yaml', 'r') as file:
-        context_data = yaml.safe_load(file)
+    # Load context.yaml and convert to JSON
+    with open('context.yaml', 'r') as yaml_file:
+        context_data = yaml.safe_load(yaml_file)
     
-    # Add additional data if needed
+    # Save as JSON file
+    with open('context.json', 'w') as json_file:
+        json.dump(context_data, json_file, indent=2)
+    
+    # Read the JSON file
+    with open('context.json', 'r') as json_file:
+        context_data = json.load(json_file)
+    
+    # Add additional data
     context_data.update({
         "vendor": "OpenAI",
         "api_key": secrets['openai_api_key']
     })
     
-    response = requests.post(url, json=context_data)
+    # Convert final context_data to JSON string
+    context_json = json.dumps(context_data)
+    
+    response = requests.post(url, data=context_json, headers={'Content-Type': 'application/json'})
     print(f"Status Code: {response.status_code}")
     print(f"Response Content: {response.content}")
     

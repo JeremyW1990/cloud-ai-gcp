@@ -19,7 +19,8 @@ firebase_admin.initialize_app(firebase_credentials)
 
 def delete_collection(collection_name, batch_size=10):
     """
-    Delete all documents in a Firestore collection, but keep the collection by adding a placeholder document.
+    Delete all documents in a Firestore collection, except for '_dummy_document'.
+    If '_dummy_document' doesn't exist, create it to keep the collection.
 
     :param collection_name: Name of the collection to delete documents from.
     :param batch_size: Number of documents to delete in each batch.
@@ -30,15 +31,21 @@ def delete_collection(collection_name, batch_size=10):
     deleted = 0
 
     for doc in docs:
-        print(f'Deleting doc {doc.id} => {doc.to_dict()}')
-        doc.reference.delete()
-        deleted += 1
+        if doc.id != '_dummy_document':
+            print(f'Deleting doc {doc.id} => {doc.to_dict()}')
+            doc.reference.delete()
+            deleted += 1
+        else:
+            print(f'Skipping _dummy_document in {collection_name}')
 
     if deleted >= batch_size:
         return delete_collection(collection_name, batch_size)
 
-    # Add a placeholder document to keep the collection
-    collection_ref.document('_dummy_document').set({'dummy_field': 'dummy_value'})
+    # # Check if '_dummy_document' exists, create it if it doesn't
+    # dummy_doc = collection_ref.document('_dummy_document').get()
+    # if not dummy_doc.exists:
+    #     collection_ref.document('_dummy_document').set({'dummy_field': 'dummy_value'})
+    #     print(f'Created _dummy_document in {collection_name}')
 
 def delete_all_collections():
     """
@@ -60,13 +67,17 @@ def delete_all_firebase_users():
             auth.delete_user(user.uid)
         page = page.get_next_page()
 
-def purge_bucket(bucket_name):
-    """
-    Delete all files and folders (prefixes) in the specified Google Cloud Storage bucket.
+from google.cloud import storage
+from google.oauth2 import service_account
 
-    :param bucket_name: Name of the bucket to delete files and folders from.
-    """
-    # Create credentials using the service account key
+from google.cloud import storage
+from google.oauth2 import service_account
+
+from google.cloud import storage
+from google.oauth2 import service_account
+
+def purge_bucket(bucket_name, service_account_path):
+    # Load credentials from the service account file
     credentials = service_account.Credentials.from_service_account_file(service_account_path)
 
     # Initialize a client with the specified credentials
@@ -75,13 +86,25 @@ def purge_bucket(bucket_name):
     # Get the bucket
     bucket = storage_client.get_bucket(bucket_name)
 
-    # List all blobs in the bucket
-    blobs = bucket.list_blobs()
+    # List all objects and delete them (including any "empty folder" prefixes)
+    blobs = list(bucket.list_blobs())  # Get a list of all objects in the bucket
+    
+    # Ensure reverse deletion order for nested folders
+    folders_to_delete = sorted([blob.name for blob in blobs if blob.name.endswith('/')], reverse=True)
 
-    # Delete each blob
+    # Delete all objects, both files and folder-like objects
     for blob in blobs:
-        print(f'Deleting blob: {blob.name}')
         blob.delete()
+
+    # Delete all folders (even if empty)
+    for folder in folders_to_delete:
+        folder_blob = bucket.blob(folder)
+        folder_blob.delete()
+
+    print(f"All objects and folders deleted from bucket {bucket_name}.")
+
+
+
 
 # Call the function to delete all documents in all collections
 delete_all_collections()
@@ -90,4 +113,4 @@ delete_all_collections()
 delete_all_firebase_users()
 
 # Call the function to delete all files and folders in the specified bucket
-purge_bucket('cloud-ai-431400-chat')
+purge_bucket('cloud-ai-431400-chat',service_account_path)

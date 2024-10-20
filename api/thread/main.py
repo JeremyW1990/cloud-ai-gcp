@@ -7,6 +7,7 @@ import uuid
 import logging
 from api.utils.firestore import firestore_doc_set
 from api.vendor.vendor_strategy import get_strategy
+from api.utils.bucket import retrieve_content_from_bucket
 
 logging.basicConfig(level=logging.INFO)
 
@@ -43,6 +44,9 @@ def create_thread(user_id):
         
         # Get the appropriate strategy based on the vendor
         strategy = get_strategy(vendor)
+
+        api_key = data.get('api_key')  # Assume API key is provided in the request
+        client = strategy.initialize_client(api_key)
         
         # Look up the Backend User ID
         mapping_ref = db.collection('user_id_mapping').document(user_id)
@@ -58,18 +62,31 @@ def create_thread(user_id):
         thread_id = str(uuid.uuid4())
         
         # Initialize the client and create the thread using the strategy
-        api_key = data.get('api_key')  # Assume API key is provided in the request
-        client = strategy.initialize_client(api_key)
-        backend_thread = strategy.create_thread_with_context(client, data.get('context'))
-        logging.info(f"Backend thread created: {backend_thread}")
+
+
+        # api_key = data.get('api_key')  # Assume API key is provided in the request
+        # client = strategy.initialize_client(api_key)
+        # backend_thread = strategy.create_thread_with_context(client, data.get('context'))
+
+        mapping_ref = db.collection('context_id_mapping').document(data.get('context_id'))
+        mapping = mapping_ref.get() 
+        backend_context_id = mapping.to_dict()['backend_context_id']
+
+        context_content = retrieve_content_from_bucket(os.environ.get('BUCKET_NAME'), f'{backend_user_id}/{backend_context_id}/context.yaml')
+
+        logging.info(f"Strategy type: {type(strategy)}")
+        logging.info(f"Strategy dir: {dir(strategy)}")
+        logging.info(f"Create thread method: {strategy.create_thread_with_context}")
+        vendor_thread = strategy.create_thread_with_context(client, context_content)
         # Prepare thread data
         thread_data = {
             "thread_id": thread_id,
             "user_id": user_id,
             "backend_user_id": backend_user_id,
-            "vendor_thread_id": backend_thread.id,
+            "vendor_thread_id": vendor_thread.id,
             "vendor": vendor,
-            "context_id": data.get('context_id')
+            "context_id": data.get('context_id'),
+            "backend_context_id": backend_context_id,
         }
         
         # Use the utility function to store the thread data
@@ -84,7 +101,7 @@ def create_thread(user_id):
             logging.error(f"Error creating thread_id mapping in Firestore: {error}")
             return jsonify({"error": f"Error creating thread_id mapping: {error}"}), 400
         
-        return jsonify({"thread_id": thread_id, "backend_thread_id": backend_thread_id}), 201
+        return jsonify({"thread_id": thread_id, "backend_thread_id": backend_thread_id, "vendor_thread_id": vendor_thread.id}), 201
     except Exception as e:
         logging.error(f"An error occurred while creating thread: {str(e)}")
         return jsonify({"error": f"An error occurred: {str(e)}"}), 400
